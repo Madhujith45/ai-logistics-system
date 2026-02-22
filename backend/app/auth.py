@@ -21,7 +21,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # Hardcoded admin for demonstration
 ADMIN_USER = {
     "username": "admin",
-    "password_hash": get_password_hash("admin123"),
+    "password_hash": "$2b$12$aVncWNccbvHaE6yAXR166.P.I4DfGtXXx7DKKtH5TON0yNSABRcoy",
     "role": "admin"
 }
 
