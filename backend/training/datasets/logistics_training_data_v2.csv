@@ -1,0 +1,601 @@
+utterance,intent
+has it reached my city,ORDER_STATUS
+Take this back???,ORDER_CANCELLATION
+Delete my order please,ORDER_CANCELLATION
+TRACK MY DELIVERY NOW,ORDER_STATUS
+Where is my order???,ORDER_STATUS
+Track order ID 12345 please,ORDER_STATUS
+Complaint about delivery,UNKNOWN
+Shipment tracking please???,ORDER_STATUS
+I need help,UNKNOWN
+Give me tracking details,ORDER_STATUS
+stop the dispatch,ORDER_CANCELLATION
+track my delivery now,ORDER_STATUS
+Live tracking update please,ORDER_STATUS
+Stop my package from shipping asap,ORDER_CANCELLATION
+WHAT IS YOUR RETURN POLICY,UNKNOWN
+WHERE IS MY ORDER,ORDER_STATUS
+pls Current status of my parcel,ORDER_STATUS
+PLEASE VOID THE ORDER,ORDER_CANCELLATION
+Withdraw my order???,ORDER_CANCELLATION
+I NO LONGER WANT THIS ORDER,ORDER_CANCELLATION
+when will my package arrive,ORDER_STATUS
+Terminate this package,ORDER_CANCELLATION
+Stop this order asap,ORDER_CANCELLATION
+LIVE TRACKING UPDATE,ORDER_STATUS
+Product defective asap,UNKNOWN
+I want to cancel this shipment???,ORDER_CANCELLATION
+I DON'T WANT THIS ANYMORE,ORDER_CANCELLATION
+pls Track my delivery now,ORDER_STATUS
+Has my parcel been dispatched,ORDER_STATUS
+Good morning???,UNKNOWN
+Is my package out for delivery,ORDER_STATUS
+ORDER PROGRESS UPDATE,ORDER_STATUS
+Stop this package,ORDER_CANCELLATION
+Has it left the warehouse,ORDER_STATUS
+Current status of  parcel,ORDER_STATUS
+pls I don’t need it anymore,ORDER_CANCELLATION
+Please stop this order asap,ORDER_CANCELLATION
+pls Where is my order,ORDER_STATUS
+pls Stop my package from shipping,ORDER_CANCELLATION
+END THIS ORDER,ORDER_CANCELLATION
+Very bad service please,UNKNOWN
+stop my delivery,ORDER_CANCELLATION
+pls Cancel it,ORDER_CANCELLATION
+cancel it,ORDER_CANCELLATION
+END THIS ORDER,ORDER_CANCELLATION
+end this order,ORDER_CANCELLATION
+pls Has my parcel been dispatched,ORDER_STATUS
+very bad service,UNKNOWN
+Very bad service please,UNKNOWN
+Track my shipment,ORDER_STATUS
+Why is refund delayed,UNKNOWN
+I need help,UNKNOWN
+Remove this purchase asap,ORDER_CANCELLATION
+I am unhappy with service,UNKNOWN
+Where is my courier asap,ORDER_STATUS
+TRACK ORDER ID 12345,ORDER_STATUS
+COURIER WAS RUDE,UNKNOWN
+Package damaged,UNKNOWN
+cancel it,ORDER_CANCELLATION
+Hello???,UNKNOWN
+I changed my mind please,ORDER_CANCELLATION
+Refund not received please,UNKNOWN
+Very bad service please,UNKNOWN
+I dont want this anymore please,ORDER_CANCELLATION
+I want to cancel this shipment asap,ORDER_CANCELLATION
+Hello,UNKNOWN
+Stop it asap,ORDER_CANCELLATION
+Complaint about delivery,UNKNOWN
+Delete my order asap,ORDER_CANCELLATION
+DO NOT SHIP THIS ORDER,ORDER_CANCELLATION
+Has it reached  city,ORDER_STATUS
+I want a refund please,UNKNOWN
+Cancel delivery request???,ORDER_CANCELLATION
+Hello please,UNKNOWN
+I need help,UNKNOWN
+Remove this purchase,ORDER_CANCELLATION
+Track  recent purchase,ORDER_STATUS
+pls Current status of my parcel,ORDER_STATUS
+pls I am unhappy with service,UNKNOWN
+Where is my order asap,ORDER_STATUS
+HAS MY PARCEL BEEN DISPATCHED,ORDER_STATUS
+Product defective,UNKNOWN
+Give me tracking details asap,ORDER_STATUS
+Has  parcel been dispatched,ORDER_STATUS
+What is your return policy???,UNKNOWN
+I want to cancel this shipment,ORDER_CANCELLATION
+stop the dispatch,ORDER_CANCELLATION
+Stop it???,ORDER_CANCELLATION
+I want to cancel this shipment,ORDER_CANCELLATION
+Track my shipment???,ORDER_STATUS
+Cancel delivery request???,ORDER_CANCELLATION
+HAS MY PARCEL BEEN DISPATCHED,ORDER_STATUS
+LIVE TRACKING UPDATE,ORDER_STATUS
+REMOVE THIS PURCHASE,ORDER_CANCELLATION
+where is my order,ORDER_STATUS
+CALL OFF MY SHIPMENT,ORDER_CANCELLATION
+Call off my shipment???,ORDER_CANCELLATION
+Product defective,UNKNOWN
+Wrong item delivered,UNKNOWN
+Wrong item delivered asap,UNKNOWN
+pls Refund not received,UNKNOWN
+Where exactly is  shipment,ORDER_STATUS
+Why is refund delayed,UNKNOWN
+pls Withdraw my order,ORDER_CANCELLATION
+I NO LONGER NEED THIS,ORDER_CANCELLATION
+stop it,ORDER_CANCELLATION
+Wrong item delivered asap,UNKNOWN
+How do I contact support???,UNKNOWN
+Shipment tracking please,ORDER_STATUS
+Take this back,ORDER_CANCELLATION
+Hello???,UNKNOWN
+pls Track order ID 12345,ORDER_STATUS
+Where is my courier please,ORDER_STATUS
+WHERE IS MY ORDER,ORDER_STATUS
+Courier was rude,UNKNOWN
+Money not credited,UNKNOWN
+Order progress update,ORDER_STATUS
+pls Shipment tracking please,ORDER_STATUS
+Check order status please,ORDER_STATUS
+Need refund details,UNKNOWN
+pls Cancel my recent purchase,ORDER_CANCELLATION
+Wrong item delivered???,UNKNOWN
+Package damaged please,UNKNOWN
+pls I no longer want this order,ORDER_CANCELLATION
+I am unhappy with service???,UNKNOWN
+pls How do I contact support,UNKNOWN
+pls Stop this order,ORDER_CANCELLATION
+LIVE TRACKING UPDATE,ORDER_STATUS
+stop my delivery,ORDER_CANCELLATION
+I no longer need this,ORDER_CANCELLATION
+Has my parcel been dispatched???,ORDER_STATUS
+PAYMENT FAILED,UNKNOWN
+Very bad service,UNKNOWN
+Very bad service???,UNKNOWN
+Is it still in transit please,ORDER_STATUS
+CANCEL MY ORDER,ORDER_CANCELLATION
+WHY IS REFUND DELAYED,UNKNOWN
+Is it still in transit asap,ORDER_STATUS
+Take this back,ORDER_CANCELLATION
+Has my parcel been dispatched please,ORDER_STATUS
+Cancel order as soon as possible asap,ORDER_CANCELLATION
+VERY BAD SERVICE,UNKNOWN
+Is it still in transit???,ORDER_STATUS
+Give me tracking details asap,ORDER_STATUS
+i don’t want the package,ORDER_CANCELLATION
+When will  package arrive,ORDER_STATUS
+I don't need this now,ORDER_CANCELLATION
+pls Why is refund delayed,UNKNOWN
+Stop my package from shipping,ORDER_CANCELLATION
+Wrong item delivered please,UNKNOWN
+How do I contact support,UNKNOWN
+Need refund details asap,UNKNOWN
+Where exactly is my shipment,ORDER_STATUS
+HOW DO I CONTACT SUPPORT,UNKNOWN
+Why is refund delayed,UNKNOWN
+pls Track my delivery now,ORDER_STATUS
+pls Has my parcel been dispatched,ORDER_STATUS
+I don’t want the package asap,ORDER_CANCELLATION
+I no longer need this,ORDER_CANCELLATION
+SHIPMENT TRACKING PLEASE,ORDER_STATUS
+Check order status,ORDER_STATUS
+Give me tracking details,ORDER_STATUS
+HAS IT REACHED MY CITY,ORDER_STATUS
+I don't need this now asap,ORDER_CANCELLATION
+Delivery tracking information asap,ORDER_STATUS
+I don’t need it anymore please,ORDER_CANCELLATION
+Delivery was late???,UNKNOWN
+Is  package out for delivery,ORDER_STATUS
+Stop the dispatch asap,ORDER_CANCELLATION
+Good morning???,UNKNOWN
+I want a refund,UNKNOWN
+Has my parcel been dispatched???,ORDER_STATUS
+Remove this order please,ORDER_CANCELLATION
+CANCEL BEFORE DISPATCH,ORDER_CANCELLATION
+Wrong item delivered???,UNKNOWN
+track my shipment,ORDER_STATUS
+Package damaged???,UNKNOWN
+Has my parcel been dispatched asap,ORDER_STATUS
+Current status of  parcel,ORDER_STATUS
+What is your return policy please,UNKNOWN
+When will my package arrive please,ORDER_STATUS
+I AM UNHAPPY WITH SERVICE,UNKNOWN
+Withdraw  order,ORDER_CANCELLATION
+pls Current status of my parcel,ORDER_STATUS
+Do not ship this order asap,ORDER_CANCELLATION
+Shipment tracking please please,ORDER_STATUS
+Cancel it,ORDER_CANCELLATION
+Delivery tracking information please,ORDER_STATUS
+I don't need this now please,ORDER_CANCELLATION
+pls I don’t want the package,ORDER_CANCELLATION
+Stop the dispatch,ORDER_CANCELLATION
+LIVE TRACKING UPDATE,ORDER_STATUS
+How do I contact support please,UNKNOWN
+please void the order,ORDER_CANCELLATION
+Stop my delivery asap,ORDER_CANCELLATION
+Track  shipment,ORDER_STATUS
+pls Is it still in transit,ORDER_STATUS
+pls Payment failed,UNKNOWN
+Track my recent purchase,ORDER_STATUS
+What is your return policy,UNKNOWN
+delivery tracking information,ORDER_STATUS
+stop the dispatch,ORDER_CANCELLATION
+pls Refund not received,UNKNOWN
+Cancel before dispatch,ORDER_CANCELLATION
+Where is my courier,ORDER_STATUS
+Cancel my order please,ORDER_CANCELLATION
+i don’t need it anymore,ORDER_CANCELLATION
+TRACK MY RECENT PURCHASE,ORDER_STATUS
+Delivery was late asap,UNKNOWN
+End this package,ORDER_CANCELLATION
+Stop my package from shipping???,ORDER_CANCELLATION
+Very bad service,UNKNOWN
+I don't want this anymore asap,ORDER_CANCELLATION
+I DON'T NEED THIS NOW,ORDER_CANCELLATION
+end this order,ORDER_CANCELLATION
+I WANT A REFUND,UNKNOWN
+Refund not received asap,UNKNOWN
+I don't want this anymore???,ORDER_CANCELLATION
+Call off my shipment asap,ORDER_CANCELLATION
+I changed  mind cancel it,ORDER_CANCELLATION
+pls I no longer need this,ORDER_CANCELLATION
+CANCEL MY RECENT PURCHASE,ORDER_CANCELLATION
+wrong item delivered,UNKNOWN
+Money not credited,UNKNOWN
+pls Delivery tracking information,ORDER_STATUS
+pls Complaint about delivery,UNKNOWN
+pls Track my recent purchase,ORDER_STATUS
+Abort  purchase,ORDER_CANCELLATION
+pls Where is my courier,ORDER_STATUS
+I don’t need it anymore please,ORDER_CANCELLATION
+Complaint about delivery,UNKNOWN
+DELIVERY WAS LATE,UNKNOWN
+Has  parcel been dispatched,ORDER_STATUS
+ABORT MY PURCHASE,ORDER_CANCELLATION
+Wrong item delivered???,UNKNOWN
+Courier was rude asap,UNKNOWN
+Track package ID 12345,ORDER_STATUS
+Courier was rude asap,UNKNOWN
+Do not ship this package,ORDER_CANCELLATION
+Terminate this order???,ORDER_CANCELLATION
+give me tracking details,ORDER_STATUS
+PACKAGE DAMAGED,UNKNOWN
+Wrong item delivered,UNKNOWN
+Is it still in transit???,ORDER_STATUS
+Give me tracking details,ORDER_STATUS
+Talk to human agent???,UNKNOWN
+pls Remove this purchase,ORDER_CANCELLATION
+Please stop this order asap,ORDER_CANCELLATION
+TALK TO HUMAN AGENT,UNKNOWN
+What is your return policy please,UNKNOWN
+COMPLAINT ABOUT DELIVERY,UNKNOWN
+pls Very bad service,UNKNOWN
+Hello???,UNKNOWN
+Where is my courier???,ORDER_STATUS
+Is my package out for delivery,ORDER_STATUS
+Track my recent purchase please,ORDER_STATUS
+pls Is my package out for delivery,ORDER_STATUS
+Complaint about delivery???,UNKNOWN
+I changed  mind cancel it,ORDER_CANCELLATION
+Current status of my parcel,ORDER_STATUS
+Delivery tracking information asap,ORDER_STATUS
+pls Check order status,ORDER_STATUS
+pls Hello,UNKNOWN
+Is my package out for delivery???,ORDER_STATUS
+Complaint about delivery,UNKNOWN
+Track my recent purchase asap,ORDER_STATUS
+Cancel package as soon as possible,ORDER_CANCELLATION
+Order progress update???,ORDER_STATUS
+Has it reached my city asap,ORDER_STATUS
+pls Delivery was late,UNKNOWN
+Cancel delivery request,ORDER_CANCELLATION
+Delivery tracking information asap,ORDER_STATUS
+Is it still in transit asap,ORDER_STATUS
+live tracking update,ORDER_STATUS
+Please void the package,ORDER_CANCELLATION
+where is my courier,ORDER_STATUS
+How do I contact support asap,UNKNOWN
+End this order asap,ORDER_CANCELLATION
+Where exactly is my shipment asap,ORDER_STATUS
+Do not ship this order asap,ORDER_CANCELLATION
+has my parcel been dispatched,ORDER_STATUS
+Is it still in transit asap,ORDER_STATUS
+Please void the order,ORDER_CANCELLATION
+I changed my mind asap,ORDER_CANCELLATION
+pls Need refund details,UNKNOWN
+Where is my package,ORDER_STATUS
+I DON'T WANT IT,ORDER_CANCELLATION
+pls I want a refund,UNKNOWN
+pls End this order,ORDER_CANCELLATION
+I need help,UNKNOWN
+Need refund details???,UNKNOWN
+has it reached my city,ORDER_STATUS
+When will my package arrive,ORDER_STATUS
+pls Courier was rude,UNKNOWN
+I need help please,UNKNOWN
+Live tracking update???,ORDER_STATUS
+Cancel order as soon as possible asap,ORDER_CANCELLATION
+Stop my package from shipping???,ORDER_CANCELLATION
+Track package ID 12345,ORDER_STATUS
+End this package,ORDER_CANCELLATION
+pls Track order ID 12345,ORDER_STATUS
+i need help,UNKNOWN
+Track my recent purchase,ORDER_STATUS
+pls When will my package arrive,ORDER_STATUS
+Shipment tracking please,ORDER_STATUS
+Stop the dispatch asap,ORDER_CANCELLATION
+Money not credited,UNKNOWN
+pls Courier was rude,UNKNOWN
+pls I am unhappy with service,UNKNOWN
+PRODUCT DEFECTIVE,UNKNOWN
+Remove this order???,ORDER_CANCELLATION
+Live tracking update,ORDER_STATUS
+CANCEL IMMEDIATELY,ORDER_CANCELLATION
+pls Payment failed,UNKNOWN
+WHERE IS MY ORDER,ORDER_STATUS
+PLEASE STOP THIS ORDER,ORDER_CANCELLATION
+WHAT IS YOUR RETURN POLICY,UNKNOWN
+Wrong item delivered asap,UNKNOWN
+pls Need refund details,UNKNOWN
+I don't want it,ORDER_CANCELLATION
+Track  recent purchase,ORDER_STATUS
+remove this purchase,ORDER_CANCELLATION
+Order progress update???,ORDER_STATUS
+I don't need this now,ORDER_CANCELLATION
+Money not credited???,UNKNOWN
+Track my recent purchase???,ORDER_STATUS
+I no longer want this order asap,ORDER_CANCELLATION
+pls Stop the dispatch,ORDER_CANCELLATION
+Give me tracking details???,ORDER_STATUS
+HAS IT LEFT THE WAREHOUSE,ORDER_STATUS
+Where is  courier,ORDER_STATUS
+shipment tracking please,ORDER_STATUS
+Abort my purchase,ORDER_CANCELLATION
+Remove this purchase,ORDER_CANCELLATION
+Where is my order please,ORDER_STATUS
+pls Has my parcel been dispatched,ORDER_STATUS
+HELLO,UNKNOWN
+Has it left the warehouse,ORDER_STATUS
+please void the order,ORDER_CANCELLATION
+Cancel immediately???,ORDER_CANCELLATION
+Has it left the warehouse asap,ORDER_STATUS
+pls Package damaged,UNKNOWN
+pls Current status of my parcel,ORDER_STATUS
+When will my package arrive asap,ORDER_STATUS
+HOW DO I CONTACT SUPPORT,UNKNOWN
+pls I don’t want the package,ORDER_CANCELLATION
+Where exactly is my shipment???,ORDER_STATUS
+pls Stop my delivery,ORDER_CANCELLATION
+CANCEL DELIVERY REQUEST,ORDER_CANCELLATION
+CHECK ORDER STATUS,ORDER_STATUS
+is my package out for delivery,ORDER_STATUS
+I want a refund???,UNKNOWN
+Order progress update,ORDER_STATUS
+Good morning please,UNKNOWN
+Stop my package from shipping please,ORDER_CANCELLATION
+pls Wrong item delivered,UNKNOWN
+stop the dispatch,ORDER_CANCELLATION
+Good morning please,UNKNOWN
+Has it reached my city asap,ORDER_STATUS
+I no longer need this please,ORDER_CANCELLATION
+pls I don’t want the package,ORDER_CANCELLATION
+Wrong item delivered,UNKNOWN
+pls I don't want it,ORDER_CANCELLATION
+Hello asap,UNKNOWN
+I changed my mind cancel it,ORDER_CANCELLATION
+pls Track order ID 12345,ORDER_STATUS
+pls Cancel it,ORDER_CANCELLATION
+pls Product defective,UNKNOWN
+DELIVERY TRACKING INFORMATION,ORDER_STATUS
+I no longer need this,ORDER_CANCELLATION
+Give me tracking details asap,ORDER_STATUS
+CHECK ORDER STATUS,ORDER_STATUS
+Stop  package from shipping,ORDER_CANCELLATION
+How do I contact support,UNKNOWN
+Wrong item delivered,UNKNOWN
+Talk to human agent,UNKNOWN
+pls Wrong item delivered,UNKNOWN
+when will my package arrive,ORDER_STATUS
+MONEY NOT CREDITED,UNKNOWN
+complaint about delivery,UNKNOWN
+Stop my package from shipping asap,ORDER_CANCELLATION
+I CHANGED MY MIND CANCEL IT,ORDER_CANCELLATION
+I NO LONGER WANT THIS ORDER,ORDER_CANCELLATION
+pls I want a refund,UNKNOWN
+Delivery tracking information please,ORDER_STATUS
+I don't need this now,ORDER_CANCELLATION
+product defective,UNKNOWN
+I don’t need it anymore,ORDER_CANCELLATION
+Remove this purchase???,ORDER_CANCELLATION
+Refund not received asap,UNKNOWN
+Is my package out for delivery???,ORDER_STATUS
+Terminate this package,ORDER_CANCELLATION
+Give me tracking details,ORDER_STATUS
+Talk to human agent???,UNKNOWN
+Is it still in transit,ORDER_STATUS
+need refund details,UNKNOWN
+I don't need this now,ORDER_CANCELLATION
+Track my delivery now asap,ORDER_STATUS
+Delete my order???,ORDER_CANCELLATION
+End this order???,ORDER_CANCELLATION
+Hello,UNKNOWN
+Has it reached my city asap,ORDER_STATUS
+REMOVE THIS PURCHASE,ORDER_CANCELLATION
+cancel delivery request,ORDER_CANCELLATION
+Order progress update asap,ORDER_STATUS
+Remove this order please,ORDER_CANCELLATION
+Delivery tracking information???,ORDER_STATUS
+please void the order,ORDER_CANCELLATION
+Delivery tracking information,ORDER_STATUS
+WHAT IS YOUR RETURN POLICY,UNKNOWN
+Payment failed,UNKNOWN
+how do i contact support,UNKNOWN
+Track my recent purchase asap,ORDER_STATUS
+NEED REFUND DETAILS,UNKNOWN
+Remove this package,ORDER_CANCELLATION
+I DON'T WANT IT,ORDER_CANCELLATION
+pls Has my parcel been dispatched,ORDER_STATUS
+I DON’T WANT THE PACKAGE,ORDER_CANCELLATION
+DELIVERY WAS LATE,UNKNOWN
+I want a refund,UNKNOWN
+pls Live tracking update,ORDER_STATUS
+Abort my purchase please,ORDER_CANCELLATION
+Cancel my recent purchase asap,ORDER_CANCELLATION
+Do not ship this order???,ORDER_CANCELLATION
+Product defective asap,UNKNOWN
+give me tracking details,ORDER_STATUS
+has my parcel been dispatched,ORDER_STATUS
+Cancel before dispatch,ORDER_CANCELLATION
+ABORT MY PURCHASE,ORDER_CANCELLATION
+VERY BAD SERVICE,UNKNOWN
+Has it left the warehouse,ORDER_STATUS
+I need help please,UNKNOWN
+where is my courier,ORDER_STATUS
+Delivery tracking information please,ORDER_STATUS
+How do I contact support,UNKNOWN
+Cancel before dispatch,ORDER_CANCELLATION
+Has it left the warehouse please,ORDER_STATUS
+pls Stop the dispatch,ORDER_CANCELLATION
+i need help,UNKNOWN
+Please void the order asap,ORDER_CANCELLATION
+pls Delivery was late,UNKNOWN
+i no longer want this order,ORDER_CANCELLATION
+Order progress update asap,ORDER_STATUS
+what is your return policy,UNKNOWN
+How do I contact support,UNKNOWN
+Payment failed asap,UNKNOWN
+pls Track my recent purchase,ORDER_STATUS
+Courier was rude asap,UNKNOWN
+need refund details,UNKNOWN
+Has it reached my city asap,ORDER_STATUS
+wrong item delivered,UNKNOWN
+Stop the dispatch???,ORDER_CANCELLATION
+Track my shipment???,ORDER_STATUS
+Complaint about delivery,UNKNOWN
+pls Cancel immediately,ORDER_CANCELLATION
+pls Delete my order,ORDER_CANCELLATION
+Money not credited please,UNKNOWN
+I changed my mind cancel it please,ORDER_CANCELLATION
+WHY IS REFUND DELAYED,UNKNOWN
+Talk to human agent,UNKNOWN
+Complaint about delivery please,UNKNOWN
+How do I contact support asap,UNKNOWN
+Need refund details,UNKNOWN
+good morning,UNKNOWN
+Has it left the warehouse asap,ORDER_STATUS
+i want a refund,UNKNOWN
+Product defective,UNKNOWN
+Talk to human agent???,UNKNOWN
+Terminate this order asap,ORDER_CANCELLATION
+COMPLAINT ABOUT DELIVERY,UNKNOWN
+Where is my courier please,ORDER_STATUS
+Is  package out for delivery,ORDER_STATUS
+Cancel my recent purchase please,ORDER_CANCELLATION
+pls Order progress update,ORDER_STATUS
+pls I no longer want this order,ORDER_CANCELLATION
+pls Is my package out for delivery,ORDER_STATUS
+pls Product defective,UNKNOWN
+I am unhappy with service???,UNKNOWN
+Call off my shipment???,ORDER_CANCELLATION
+NEED REFUND DETAILS,UNKNOWN
+Product defective asap,UNKNOWN
+Has it left the warehouse,ORDER_STATUS
+has my parcel been dispatched,ORDER_STATUS
+Hello,UNKNOWN
+Talk to human agent please,UNKNOWN
+Give me tracking details,ORDER_STATUS
+Withdraw  order,ORDER_CANCELLATION
+Withdraw my order please,ORDER_CANCELLATION
+Call off my shipment???,ORDER_CANCELLATION
+When will  package arrive,ORDER_STATUS
+Stop it asap,ORDER_CANCELLATION
+Order progress update asap,ORDER_STATUS
+shipment tracking please,ORDER_STATUS
+Live tracking update,ORDER_STATUS
+pls Abort my purchase,ORDER_CANCELLATION
+VERY BAD SERVICE,UNKNOWN
+Stop my package from shipping asap,ORDER_CANCELLATION
+Track my shipment,ORDER_STATUS
+Track  recent purchase,ORDER_STATUS
+pls Very bad service,UNKNOWN
+Cancel order as soon as possible,ORDER_CANCELLATION
+Track my recent purchase asap,ORDER_STATUS
+Check order status asap,ORDER_STATUS
+Do not ship this package,ORDER_CANCELLATION
+Why is refund delayed please,UNKNOWN
+Call off my shipment???,ORDER_CANCELLATION
+Wrong item delivered please,UNKNOWN
+How do I contact support asap,UNKNOWN
+Remove this order please,ORDER_CANCELLATION
+pls Complaint about delivery,UNKNOWN
+I am unhappy with service asap,UNKNOWN
+Shipment tracking please asap,ORDER_STATUS
+LIVE TRACKING UPDATE,ORDER_STATUS
+pls Wrong item delivered,UNKNOWN
+Complaint about delivery asap,UNKNOWN
+pls Cancel immediately,ORDER_CANCELLATION
+I WANT TO CANCEL THIS SHIPMENT,ORDER_CANCELLATION
+Order progress update,ORDER_STATUS
+I don't want this anymore,ORDER_CANCELLATION
+Package damaged,UNKNOWN
+Shipment tracking please,ORDER_STATUS
+I am unhappy with service asap,UNKNOWN
+Abort my purchase please,ORDER_CANCELLATION
+I am unhappy with service,UNKNOWN
+I NEED HELP,UNKNOWN
+I don't want it???,ORDER_CANCELLATION
+Has my parcel been dispatched please,ORDER_STATUS
+Is my package out for delivery???,ORDER_STATUS
+HAS IT LEFT THE WAREHOUSE,ORDER_STATUS
+pls I dont want this anymore,ORDER_CANCELLATION
+give me tracking details,ORDER_STATUS
+pls How do I contact support,UNKNOWN
+Delivery was late,UNKNOWN
+Package damaged,UNKNOWN
+Where exactly is my shipment???,ORDER_STATUS
+Stop this order,ORDER_CANCELLATION
+I want to cancel this shipment,ORDER_CANCELLATION
+has it left the warehouse,ORDER_STATUS
+Cancel my recent purchase asap,ORDER_CANCELLATION
+Check package status,ORDER_STATUS
+PLEASE STOP THIS ORDER,ORDER_CANCELLATION
+cancel immediately,ORDER_CANCELLATION
+pls Courier was rude,UNKNOWN
+Product defective please,UNKNOWN
+pls Delivery tracking information,ORDER_STATUS
+Why is refund delayed,UNKNOWN
+I DON'T WANT IT,ORDER_CANCELLATION
+pls Track order ID 12345,ORDER_STATUS
+When will  package arrive,ORDER_STATUS
+Package damaged asap,UNKNOWN
+Please void the order,ORDER_CANCELLATION
+pls Need refund details,UNKNOWN
+Do not ship this order,ORDER_CANCELLATION
+Order progress update,ORDER_STATUS
+Take this back,ORDER_CANCELLATION
+Cancel delivery request,ORDER_CANCELLATION
+I don’t want the package,ORDER_CANCELLATION
+Live tracking update asap,ORDER_STATUS
+Stop the dispatch asap,ORDER_CANCELLATION
+pls Call off my shipment,ORDER_CANCELLATION
+is my package out for delivery,ORDER_STATUS
+i want a refund,UNKNOWN
+I NEED HELP,UNKNOWN
+Call off my shipment???,ORDER_CANCELLATION
+live tracking update,ORDER_STATUS
+Remove this package,ORDER_CANCELLATION
+Courier was rude???,UNKNOWN
+HAS MY PARCEL BEEN DISPATCHED,ORDER_STATUS
+GOOD MORNING,UNKNOWN
+I don’t need it anymore asap,ORDER_CANCELLATION
+Need refund details???,UNKNOWN
+CHECK ORDER STATUS,ORDER_STATUS
+Track  delivery now,ORDER_STATUS
+When will my package arrive asap,ORDER_STATUS
+has it reached my city,ORDER_STATUS
+I changed my mind,ORDER_CANCELLATION
+WHY IS REFUND DELAYED,UNKNOWN
+Complaint about delivery,UNKNOWN
+Shipment tracking please please,ORDER_STATUS
+Current status of my parcel asap,ORDER_STATUS
+delivery was late,UNKNOWN
+Delivery was late???,UNKNOWN
+pls Has my parcel been dispatched,ORDER_STATUS
+Product defective please,UNKNOWN
+complaint about delivery,UNKNOWN
+Courier was rude asap,UNKNOWN
+Complaint about delivery please,UNKNOWN
+Live tracking update,ORDER_STATUS
+pls I changed my mind cancel it,ORDER_CANCELLATION
+Cancel before dispatch please,ORDER_CANCELLATION
+How do I contact support???,UNKNOWN
+I need help???,UNKNOWN
+Cancel my recent purchase please,ORDER_CANCELLATION
+I need help please,UNKNOWN
+Order progress update asap,ORDER_STATUS
+pls Please stop this order,ORDER_CANCELLATION
+Talk to human agent,UNKNOWN
+product defective,UNKNOWN
+I don’t need it anymore,ORDER_CANCELLATION
+Need refund details???,UNKNOWN

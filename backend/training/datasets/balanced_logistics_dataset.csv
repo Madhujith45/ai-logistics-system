@@ -1,0 +1,231 @@
+utterance,intent,category,tags
+I want information about canceling orders,cancel_order,ORDER,BM
+could you help me cancel the last order I have made?,cancel_order,ORDER,BIP
+I have a question about cancelling an order,cancel_order,ORDER,B
+help me cancelling my order,cancel_order,ORDER,B
+could you give me information about order cancellations?,cancel_order,ORDER,BIMP
+assistance cancelling an order,cancel_order,ORDER,B
+how can I cancel the last order I have made?,cancel_order,ORDER,BI
+help canceling the order I have made,cancel_order,ORDER,B
+how do I cancel the last order I have made?,cancel_order,ORDER,BI
+where could I cancel my order?,cancel_order,ORDER,BIP
+I do not know how to cancel an order I have made,cancel_order,ORDER,BE
+I need help with canceling the last order,cancel_order,ORDER,B
+I would like to know more about order cancellations,cancel_order,ORDER,BMP
+where can I cancel the last order I made?,cancel_order,ORDER,BI
+I don't want the last order I made,cancel_order,ORDER,B
+order cancelation,cancel_order,ORDER,BK
+I want assistance to cancel the last order,cancel_order,ORDER,B
+I want assistance to cancel the order I have made,cancel_order,ORDER,B
+I have a problem with cancelling the order I made,cancel_order,ORDER,B
+I have a problem with cancelling an order I made,cancel_order,ORDER,B
+how could I get information about cancelling orders?,cancel_order,ORDER,BIMP
+is it possible to cancel the last order?,cancel_order,ORDER,BI
+how could I find information about cancelling an order?,cancel_order,ORDER,BIP
+could you tell me about changing the shipping address?,change_shipping_address,SHIPPING_ADDRESS,BIP
+I have a trouble trying to change the address,change_shipping_address,SHIPPING_ADDRESS,BL
+I want information about a shipping address change,change_shipping_address,SHIPPING_ADDRESS,B
+I try to correct my shipping address,change_shipping_address,SHIPPING_ADDRESS,BL
+want support changing the shipping address,change_shipping_address,SHIPPING_ADDRESS,BLQ
+I need help to change my shipping address,change_shipping_address,SHIPPING_ADDRESS,B
+I would like to change the shipping address,change_shipping_address,SHIPPING_ADDRESS,BP
+how could I get information about a shipping address change?,change_shipping_address,SHIPPING_ADDRESS,BIP
+help with a shipping address change,change_shipping_address,SHIPPING_ADDRESS,B
+I have issues changing my shipping address,change_shipping_address,SHIPPING_ADDRESS,BM
+can you tell me about changing my shipping address?,change_shipping_address,SHIPPING_ADDRESS,BI
+I want help trying to change my shipping address,change_shipping_address,SHIPPING_ADDRESS,B
+can you help me change my shipping address?,change_shipping_address,SHIPPING_ADDRESS,BI
+I would like to change my shipping address,change_shipping_address,SHIPPING_ADDRESS,BP
+I need help changing the shipping address,change_shipping_address,SHIPPING_ADDRESS,B
+supports trying to update my shipping address,change_shipping_address,SHIPPING_ADDRESS,BLM
+I want to know about changing my shipping address,change_shipping_address,SHIPPING_ADDRESS,B
+I don't know what I have to do to change my shipping address,change_shipping_address,SHIPPING_ADDRESS,B
+I do not know how I could change the shipping address,change_shipping_address,SHIPPING_ADDRESS,BEP
+I do not know how I could change my shipping address,change_shipping_address,SHIPPING_ADDRESS,BEP
+I would like information about changing the shipping address,change_shipping_address,SHIPPING_ADDRESS,BP
+i do not know how to editmy shipping address,change_shipping_address,SHIPPING_ADDRESS,BELQZ
+I don't know what I need to do to change my shipping address,change_shipping_address,SHIPPING_ADDRESS,B
+I don't know how I can check your money back policy,check_refund_policy,REFUND,B
+I need help checking in what cases can I ask for refunds,check_refund_policy,REFUND,B
+can you help me to check your refund policy?,check_refund_policy,REFUND,BI
+could I check in what cases can I ask to be refunded?,check_refund_policy,REFUND,BIP
+could I check in what cases can I ask for a refund?,check_refund_policy,REFUND,BIP
+I have got to check your money back policy,check_refund_policy,REFUND,B
+check under what circumstances can I ask to be refunded,check_refund_policy,REFUND,B
+what do I have to do to check your refund policy?,check_refund_policy,REFUND,BI
+could you show me your money back policy?,check_refund_policy,REFUND,BIP
+assistance to check in what cases can I ask for a refund,check_refund_policy,REFUND,B
+help checking in what cases can I ask to be refunded,check_refund_policy,REFUND,B
+assistance checking in what cases can I ask for a refund,check_refund_policy,REFUND,B
+in what cases can I ask to be refunded?,check_refund_policy,REFUND,BI
+how do I check your money back policy?,check_refund_policy,REFUND,BI
+how could I check your refund policy?,check_refund_policy,REFUND,BIP
+I need assistance to check how long refunds usually take,check_refund_policy,REFUND,B
+I want to check in what cases can I ask to be refunded,check_refund_policy,REFUND,B
+can I check in what cases can I ask for my money back?,check_refund_policy,REFUND,BI
+assistance to check your money back policy,check_refund_policy,REFUND,B
+help me check in what cases can I ask to be refunded,check_refund_policy,REFUND,B
+I try to check in what cases can I ask for refunds,check_refund_policy,REFUND,B
+in what cases can I ask for refunds?,check_refund_policy,REFUND,BI
+I am trying to check in what cases can I ask for a refund,check_refund_policy,REFUND,B
+I don't know what I need to do to file a complaint,complaint,FEEDBACK,B
+"I am not happy with your work, lodge a complaint",complaint,FEEDBACK,BCEL
+help me file a complaint against your business,complaint,FEEDBACK,B
+i need help lodging a claim against ur organization,complaint,FEEDBACK,BLQ
+need assistance to make a consumer claim,complaint,FEEDBACK,BLQ
+I want to make a complaint against your company,complaint,FEEDBACK,BL
+I call to file a complaint against your business,complaint,FEEDBACK,B
+can I make a complaint against your business?,complaint,FEEDBACK,BIL
+i do not know how to make a fucking consumer reclamation,complaint,FEEDBACK,BELQW
+I need help to file a complaint against your business,complaint,FEEDBACK,B
+i need assistance to file a complaint against ur company,complaint,FEEDBACK,BLQ
+help me filing a consumer complaint against ur company,complaint,FEEDBACK,BLQ
+can you help  me making a claim against your business?,complaint,FEEDBACK,BILZ
+I need assistance to file a complaint against your business,complaint,FEEDBACK,B
+help to file a consumer claim against your company,complaint,FEEDBACK,BL
+can you help me file a complaint?,complaint,FEEDBACK,BI
+help me filing a complaint,complaint,FEEDBACK,B
+maing claim,complaint,FEEDBACK,BLZ
+i want assistance to lodge a customer claim,complaint,FEEDBACK,BLQ
+help making a consumer complaint against your company,complaint,FEEDBACK,BL
+want assistance making a damn customer complaint,complaint,FEEDBACK,BLQW
+I am calling to file a complaint,complaint,FEEDBACK,B
+I'm not happy wih ur service help me to file a claim,complaint,FEEDBACK,BCELQZ
+I am calling to check the options for delivery,delivery_options,DELIVERY,B
+assistance checking what delivery options I can choose,delivery_options,DELIVERY,BM
+tell me more about the delivery options,delivery_options,DELIVERY,B
+help me checking the delivery options,delivery_options,DELIVERY,B
+I want help checking the delivery options,delivery_options,DELIVERY,B
+could I check what options for delivery are available?,delivery_options,DELIVERY,BIMP
+could you help me checking what options for delivery I have?,delivery_options,DELIVERY,BIMP
+could you show me what delivery options are available?,delivery_options,DELIVERY,BIMP
+I want help checking the options for delivery,delivery_options,DELIVERY,B
+could you show me what options for delivery I can choose?,delivery_options,DELIVERY,BIMP
+I need information about the delivery options,delivery_options,DELIVERY,B
+assistance to check what options for delivery are available,delivery_options,DELIVERY,BM
+show me what delivery options you offer,delivery_options,DELIVERY,BM
+can you help me check what options for delivery I have?,delivery_options,DELIVERY,BIM
+checking the options for delivery,delivery_options,DELIVERY,B
+how could I get information about the options for delivery?,delivery_options,DELIVERY,BIP
+I would like to check what delivery options I have,delivery_options,DELIVERY,BMP
+I am calling to check what delivery options I have,delivery_options,DELIVERY,BM
+assistance to check what delivery options I have,delivery_options,DELIVERY,BM
+I don't know how I can check what delivery options you offer,delivery_options,DELIVERY,BM
+where could I check what delivery options I have?,delivery_options,DELIVERY,BIMP
+where could I check the delivery options?,delivery_options,DELIVERY,BIP
+help me to check what delivery options are available,delivery_options,DELIVERY,BM
+where can I find information about the delivery period?,delivery_period,DELIVERY,BI
+I do not know how to check when my item is going to arrive,delivery_period,DELIVERY,BE
+I need help to check how soon can I expect the item,delivery_period,DELIVERY,B
+I am trying to find delivery periods,delivery_period,DELIVERY,BE
+show me how soon can I expect the item,delivery_period,DELIVERY,B
+how can I check when my item is going to arrive?,delivery_period,DELIVERY,BI
+I am calling to check how soon can I expect the delivery,delivery_period,DELIVERY,B
+could you help me check how soon can I expect the item?,delivery_period,DELIVERY,BIP
+show me how soon can I expect the delivery,delivery_period,DELIVERY,B
+show me when will my item arrive,delivery_period,DELIVERY,B
+how to check when my item is going to arrive?,delivery_period,DELIVERY,BI
+will you show me how long the delivery takes?,delivery_period,DELIVERY,BIP
+I don't know how I could check when will my item arrive,delivery_period,DELIVERY,BP
+where can I get information about delivery periods?,delivery_period,DELIVERY,BI
+could you show me when my item is going to arrive?,delivery_period,DELIVERY,BIP
+I am trying to find information about delivery periods,delivery_period,DELIVERY,BE
+I want assistance checking how long the delivery takes,delivery_period,DELIVERY,B
+I want help to check how long the delivery takes,delivery_period,DELIVERY,B
+information about the delivery period,delivery_period,DELIVERY,B
+give me information about the delivery period,delivery_period,DELIVERY,B
+how could I check when will my item arrive?,delivery_period,DELIVERY,BIP
+where could I check when my item is going to arrive?,delivery_period,DELIVERY,BIP
+what is the delivery period for this order?,delivery_period,DELIVERY,BI
+assistance to get a refund,get_refund,REFUND,B
+I need help getting refunds of money,get_refund,REFUND,BM
+I don't know what I have to do to get a refund of money,get_refund,REFUND,B
+I don't know how I can get a refund,get_refund,REFUND,B
+help me getting a refund,get_refund,REFUND,B
+I do not know how I could get refunds,get_refund,REFUND,BEMP
+I do not know how I could get a refund of money,get_refund,REFUND,BEP
+I want to get refunds,get_refund,REFUND,BM
+I do not know what I have to do to get my money back,get_refund,REFUND,BE
+assistance to get refunds,get_refund,REFUND,BM
+I don't know how I can get my money back,get_refund,REFUND,B
+I need a refund,get_refund,REFUND,B
+how can I get a refund of money?,get_refund,REFUND,BI
+I need help getting a refund,get_refund,REFUND,B
+help me getting a refund of money,get_refund,REFUND,B
+I want assistance getting a refund of money,get_refund,REFUND,B
+I am trying to get my money back,get_refund,REFUND,B
+I want assistance getting refunds of money,get_refund,REFUND,BM
+I don't know what to do to get my money back,get_refund,REFUND,B
+I don't know what to do to get refunds of money,get_refund,REFUND,BM
+how do I get a refund?,get_refund,REFUND,BI
+could you help me get refunds?,get_refund,REFUND,BIMP
+when will I get a refund?,get_refund,REFUND,BI
+where could I report an issue with payments?,payment_issue,PAYMENT,BIMP
+I don't know how I could report payment issues,payment_issue,PAYMENT,BMP
+can you help me solving an issue with payment?,payment_issue,PAYMENT,BI
+I don't know how I can report an issue with payments,payment_issue,PAYMENT,BM
+issues with payments,payment_issue,PAYMENT,BKM
+help me to solve issues with payment,payment_issue,PAYMENT,BM
+I don't know how I can report a payment issue,payment_issue,PAYMENT,B
+can you help me solve issues with payment?,payment_issue,PAYMENT,BIM
+help solving a payment issue,payment_issue,PAYMENT,B
+I am trying to report issues with payment,payment_issue,PAYMENT,BM
+I need help solving issues with payments,payment_issue,PAYMENT,BM
+could you help me to report an issue with payment?,payment_issue,PAYMENT,BIP
+is it possible to report a payment issue?,payment_issue,PAYMENT,BI
+I need assistance solving payment issues,payment_issue,PAYMENT,BM
+I need help to solve a payment issue,payment_issue,PAYMENT,B
+help me to report a payment issue,payment_issue,PAYMENT,B
+help me to report an issue with payments,payment_issue,PAYMENT,BM
+can you help me to solve issues with payment?,payment_issue,PAYMENT,BIM
+I have to report a payment issue,payment_issue,PAYMENT,B
+I am trying to report payment issues,payment_issue,PAYMENT,BM
+help me solving issues with payments,payment_issue,PAYMENT,BM
+help me report issues with payment,payment_issue,PAYMENT,BM
+could you help me report payment issues?,payment_issue,PAYMENT,BIMP
+I need to check my order ETA,track_order,ORDER,B
+what do I need to do to track my order?,track_order,ORDER,BI
+I cannot check the status of my order,track_order,ORDER,BE
+could you help me to check the status of my order?,track_order,ORDER,BIP
+I need to track my last order,track_order,ORDER,B
+I have got to track the last order,track_order,ORDER,B
+could I track the last order?,track_order,ORDER,BIP
+could I check the status of my order?,track_order,ORDER,BIP
+I need to track my order,track_order,ORDER,B
+is it possible to track my order?,track_order,ORDER,BI
+I try to track an order,track_order,ORDER,B
+when will my order arrive,track_order,ORDER,B
+help tracking my order,track_order,ORDER,B
+I want to track an order,track_order,ORDER,B
+check the status of my order,track_order,ORDER,B
+I need assistance checking my order ETA,track_order,ORDER,B
+help checking the status of my order,track_order,ORDER,B
+I have to track an order,track_order,ORDER,B
+I don't know what to do to track my last order,track_order,ORDER,B
+how do I track the last order?,track_order,ORDER,BI
+I don't know how I can track my last order,track_order,ORDER,B
+where could I track the last order?,track_order,ORDER,BIP
+can you help me to track the last order?,track_order,ORDER,BI
+help me check my refund status,track_refund,REFUND,B
+will you show me my refund status?,track_refund,REFUND,BIP
+would it be possible to check the status of the refund?,track_refund,REFUND,BIP
+I want assistance checking the status of my refund,track_refund,REFUND,B
+assistance to check the status of the refund,track_refund,REFUND,B
+I need assistance to check my refund status,track_refund,REFUND,B
+I would like to check the refund status,track_refund,REFUND,BP
+I do not know how I could check the status of my refund,track_refund,REFUND,BEP
+how could I check my refund status?,track_refund,REFUND,BIP
+how can I check the status of my refund?,track_refund,REFUND,BI
+help checking if there is anything wrong with my refund,track_refund,REFUND,B
+could I check the status of my refund?,track_refund,REFUND,BIP
+help me to check the status of my refund,track_refund,REFUND,B
+could you show me the refund status?,track_refund,REFUND,BIP
+what do I have to do to check the refund status?,track_refund,REFUND,BI
+how can I check the refund status?,track_refund,REFUND,BI
+I am trying to check the status of my refund,track_refund,REFUND,B
+I can't check if there is anything new on my refund,track_refund,REFUND,B
+help to track the refund,track_refund,REFUND,B
+help checking the refund status,track_refund,REFUND,B
+I try to check my refund status,track_refund,REFUND,B
+I am trying to track the refund,track_refund,REFUND,B
+I need help checking if there is any updates on my refund,track_refund,REFUND,BM

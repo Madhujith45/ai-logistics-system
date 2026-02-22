@@ -1,0 +1,501 @@
+utterance,intent
+Where is my order,track_order
+Track my shipment,track_order
+Check order status,track_order
+Has my parcel been dispatched,track_order
+Is my package out for delivery,track_order
+Track order ID 12345,track_order
+Where is my courier,track_order
+Shipment tracking please,track_order
+Live tracking update,track_order
+Has it reached my city,track_order
+Current status of my parcel,track_order
+When will my package arrive,track_order
+Is it still in transit,track_order
+Track my delivery now,track_order
+Give me tracking details,track_order
+Order progress update,track_order
+Has it left the warehouse,track_order
+Where exactly is my shipment,track_order
+Delivery tracking information,track_order
+Track my recent purchase,track_order
+What is the current delivery status,track_order
+Tell me the status of my package,track_order
+I want to know where my shipment is,track_order
+Track this order for me,track_order
+Is my order on the way,track_order
+Check my parcel progress,track_order
+Track the shipment right now,track_order
+Please provide tracking information,track_order
+Has delivery started,track_order
+Where can I track my order,track_order
+Where is my order,track_order
+Track my shipment,track_order
+Check order status,track_order
+Has my parcel been dispatched,track_order
+Is my package out for delivery,track_order
+Track order ID 12345,track_order
+Where is my courier,track_order
+Shipment tracking please,track_order
+Live tracking update,track_order
+Has it reached my city,track_order
+Current status of my parcel,track_order
+When will my package arrive,track_order
+Is it still in transit,track_order
+Track my delivery now,track_order
+Give me tracking details,track_order
+Order progress update,track_order
+Has it left the warehouse,track_order
+Where exactly is my shipment,track_order
+Delivery tracking information,track_order
+Track my recent purchase,track_order
+What is the current delivery status,track_order
+Tell me the status of my package,track_order
+I want to know where my shipment is,track_order
+Track this order for me,track_order
+Is my order on the way,track_order
+Check my parcel progress,track_order
+Track the shipment right now,track_order
+Please provide tracking information,track_order
+Has delivery started,track_order
+Where can I track my order,track_order
+Where is my order,track_order
+Track my shipment,track_order
+Check order status,track_order
+Has my parcel been dispatched,track_order
+Is my package out for delivery,track_order
+Track order ID 12345,track_order
+Where is my courier,track_order
+Shipment tracking please,track_order
+Live tracking update,track_order
+Has it reached my city,track_order
+Current status of my parcel,track_order
+When will my package arrive,track_order
+Is it still in transit,track_order
+Track my delivery now,track_order
+Give me tracking details,track_order
+Order progress update,track_order
+Has it left the warehouse,track_order
+Where exactly is my shipment,track_order
+Delivery tracking information,track_order
+Track my recent purchase,track_order
+What is the current delivery status,track_order
+Tell me the status of my package,track_order
+I want to know where my shipment is,track_order
+Track this order for me,track_order
+Is my order on the way,track_order
+Check my parcel progress,track_order
+Track the shipment right now,track_order
+Please provide tracking information,track_order
+Has delivery started,track_order
+Where can I track my order,track_order
+Where is my order,track_order
+Track my shipment,track_order
+Check order status,track_order
+Has my parcel been dispatched,track_order
+Is my package out for delivery,track_order
+Track order ID 12345,track_order
+Where is my courier,track_order
+Shipment tracking please,track_order
+Live tracking update,track_order
+Has it reached my city,track_order
+Cancel my order,cancel_order
+I want to cancel this shipment,cancel_order
+Stop my delivery,cancel_order
+Abort my purchase,cancel_order
+Cancel immediately,cancel_order
+Do not ship this order,cancel_order
+I changed my mind cancel it,cancel_order
+Terminate this order,cancel_order
+Delete my order,cancel_order
+Withdraw my order,cancel_order
+Cancel before dispatch,cancel_order
+Call off my shipment,cancel_order
+Cancel my recent purchase,cancel_order
+Please void the order,cancel_order
+Cancel delivery request,cancel_order
+Cancel the shipment right now,cancel_order
+Stop the dispatch,cancel_order
+Remove this order,cancel_order
+Cancel order as soon as possible,cancel_order
+I want this order cancelled,cancel_order
+Stop my package from shipping,cancel_order
+Cancel this product order,cancel_order
+I need to cancel my purchase,cancel_order
+Cancel my online order,cancel_order
+Please stop this shipment,cancel_order
+Cancel this item immediately,cancel_order
+Do not proceed with delivery,cancel_order
+Cancel this transaction,cancel_order
+I no longer want this order,cancel_order
+Cancel the package delivery,cancel_order
+Cancel my order,cancel_order
+I want to cancel this shipment,cancel_order
+Stop my delivery,cancel_order
+Abort my purchase,cancel_order
+Cancel immediately,cancel_order
+Do not ship this order,cancel_order
+I changed my mind cancel it,cancel_order
+Terminate this order,cancel_order
+Delete my order,cancel_order
+Withdraw my order,cancel_order
+Cancel before dispatch,cancel_order
+Call off my shipment,cancel_order
+Cancel my recent purchase,cancel_order
+Please void the order,cancel_order
+Cancel delivery request,cancel_order
+Cancel the shipment right now,cancel_order
+Stop the dispatch,cancel_order
+Remove this order,cancel_order
+Cancel order as soon as possible,cancel_order
+I want this order cancelled,cancel_order
+Stop my package from shipping,cancel_order
+Cancel this product order,cancel_order
+I need to cancel my purchase,cancel_order
+Cancel my online order,cancel_order
+Please stop this shipment,cancel_order
+Cancel this item immediately,cancel_order
+Do not proceed with delivery,cancel_order
+Cancel this transaction,cancel_order
+I no longer want this order,cancel_order
+Cancel the package delivery,cancel_order
+Cancel my order,cancel_order
+I want to cancel this shipment,cancel_order
+Stop my delivery,cancel_order
+Abort my purchase,cancel_order
+Cancel immediately,cancel_order
+Do not ship this order,cancel_order
+I changed my mind cancel it,cancel_order
+Terminate this order,cancel_order
+Delete my order,cancel_order
+Withdraw my order,cancel_order
+Cancel before dispatch,cancel_order
+Call off my shipment,cancel_order
+Cancel my recent purchase,cancel_order
+Please void the order,cancel_order
+Cancel delivery request,cancel_order
+Cancel the shipment right now,cancel_order
+Stop the dispatch,cancel_order
+Remove this order,cancel_order
+Cancel order as soon as possible,cancel_order
+I want this order cancelled,cancel_order
+Stop my package from shipping,cancel_order
+Cancel this product order,cancel_order
+I need to cancel my purchase,cancel_order
+Cancel my online order,cancel_order
+Please stop this shipment,cancel_order
+Cancel this item immediately,cancel_order
+Do not proceed with delivery,cancel_order
+Cancel this transaction,cancel_order
+I no longer want this order,cancel_order
+Cancel the package delivery,cancel_order
+Cancel my order,cancel_order
+I want to cancel this shipment,cancel_order
+Stop my delivery,cancel_order
+Abort my purchase,cancel_order
+Cancel immediately,cancel_order
+Do not ship this order,cancel_order
+I changed my mind cancel it,cancel_order
+Terminate this order,cancel_order
+Delete my order,cancel_order
+Withdraw my order,cancel_order
+Reschedule my delivery,reschedule_delivery
+Deliver tomorrow instead,reschedule_delivery
+Change delivery date,reschedule_delivery
+Postpone shipment,reschedule_delivery
+Deliver next week,reschedule_delivery
+Shift delivery time,reschedule_delivery
+I will not be home today,reschedule_delivery
+Deliver after 6 PM,reschedule_delivery
+Move delivery to Friday,reschedule_delivery
+Delay my package,reschedule_delivery
+Schedule it for weekend,reschedule_delivery
+Push delivery by two days,reschedule_delivery
+Deliver later,reschedule_delivery
+Switch delivery date,reschedule_delivery
+Change my delivery schedule,reschedule_delivery
+Adjust delivery timing,reschedule_delivery
+Move shipment to next week,reschedule_delivery
+Reschedule this order,reschedule_delivery
+Modify delivery time,reschedule_delivery
+Delay shipment arrival,reschedule_delivery
+Can you deliver on Monday,reschedule_delivery
+Reschedule my package,reschedule_delivery
+Change the drop off date,reschedule_delivery
+Deliver on another day,reschedule_delivery
+I need a different delivery slot,reschedule_delivery
+Please delay my delivery,reschedule_delivery
+Move my shipment date,reschedule_delivery
+Adjust my delivery time,reschedule_delivery
+Reschedule the courier visit,reschedule_delivery
+Change delivery appointment,reschedule_delivery
+Reschedule my delivery,reschedule_delivery
+Deliver tomorrow instead,reschedule_delivery
+Change delivery date,reschedule_delivery
+Postpone shipment,reschedule_delivery
+Deliver next week,reschedule_delivery
+Shift delivery time,reschedule_delivery
+I will not be home today,reschedule_delivery
+Deliver after 6 PM,reschedule_delivery
+Move delivery to Friday,reschedule_delivery
+Delay my package,reschedule_delivery
+Schedule it for weekend,reschedule_delivery
+Push delivery by two days,reschedule_delivery
+Deliver later,reschedule_delivery
+Switch delivery date,reschedule_delivery
+Change my delivery schedule,reschedule_delivery
+Adjust delivery timing,reschedule_delivery
+Move shipment to next week,reschedule_delivery
+Reschedule this order,reschedule_delivery
+Modify delivery time,reschedule_delivery
+Delay shipment arrival,reschedule_delivery
+Can you deliver on Monday,reschedule_delivery
+Reschedule my package,reschedule_delivery
+Change the drop off date,reschedule_delivery
+Deliver on another day,reschedule_delivery
+I need a different delivery slot,reschedule_delivery
+Please delay my delivery,reschedule_delivery
+Move my shipment date,reschedule_delivery
+Adjust my delivery time,reschedule_delivery
+Reschedule the courier visit,reschedule_delivery
+Change delivery appointment,reschedule_delivery
+Reschedule my delivery,reschedule_delivery
+Deliver tomorrow instead,reschedule_delivery
+Change delivery date,reschedule_delivery
+Postpone shipment,reschedule_delivery
+Deliver next week,reschedule_delivery
+Shift delivery time,reschedule_delivery
+I will not be home today,reschedule_delivery
+Deliver after 6 PM,reschedule_delivery
+Move delivery to Friday,reschedule_delivery
+Delay my package,reschedule_delivery
+Schedule it for weekend,reschedule_delivery
+Push delivery by two days,reschedule_delivery
+Deliver later,reschedule_delivery
+Switch delivery date,reschedule_delivery
+Change my delivery schedule,reschedule_delivery
+Adjust delivery timing,reschedule_delivery
+Move shipment to next week,reschedule_delivery
+Reschedule this order,reschedule_delivery
+Modify delivery time,reschedule_delivery
+Delay shipment arrival,reschedule_delivery
+Can you deliver on Monday,reschedule_delivery
+Reschedule my package,reschedule_delivery
+Change the drop off date,reschedule_delivery
+Deliver on another day,reschedule_delivery
+I need a different delivery slot,reschedule_delivery
+Please delay my delivery,reschedule_delivery
+Move my shipment date,reschedule_delivery
+Adjust my delivery time,reschedule_delivery
+Reschedule the courier visit,reschedule_delivery
+Change delivery appointment,reschedule_delivery
+Reschedule my delivery,reschedule_delivery
+Deliver tomorrow instead,reschedule_delivery
+Change delivery date,reschedule_delivery
+Postpone shipment,reschedule_delivery
+Deliver next week,reschedule_delivery
+Shift delivery time,reschedule_delivery
+I will not be home today,reschedule_delivery
+Deliver after 6 PM,reschedule_delivery
+Move delivery to Friday,reschedule_delivery
+Delay my package,reschedule_delivery
+I want a refund,refund_issue
+How do I get a refund,refund_issue
+My refund not processed,refund_issue
+Track my refund,refund_issue
+Refund status update,refund_issue
+When will refund be credited,refund_issue
+Refund delay issue,refund_issue
+I need my money back,refund_issue
+Refund for cancelled order,refund_issue
+Refund not received yet,refund_issue
+Where is my refund,refund_issue
+Refund still pending,refund_issue
+Money not credited,refund_issue
+Return my payment,refund_issue
+Please process my refund,refund_issue
+Refund processing time,refund_issue
+Why is my refund delayed,refund_issue
+Refund inquiry,refund_issue
+Credit my refund amount,refund_issue
+Refund support request,refund_issue
+Refund has not arrived,refund_issue
+Waiting for refund confirmation,refund_issue
+Refund transaction issue,refund_issue
+Need refund details,refund_issue
+Refund taking too long,refund_issue
+When is refund expected,refund_issue
+Refund assistance needed,refund_issue
+Follow up on refund,refund_issue
+Refund still not credited,refund_issue
+Money back request,refund_issue
+I want a refund,refund_issue
+How do I get a refund,refund_issue
+My refund not processed,refund_issue
+Track my refund,refund_issue
+Refund status update,refund_issue
+When will refund be credited,refund_issue
+Refund delay issue,refund_issue
+I need my money back,refund_issue
+Refund for cancelled order,refund_issue
+Refund not received yet,refund_issue
+Where is my refund,refund_issue
+Refund still pending,refund_issue
+Money not credited,refund_issue
+Return my payment,refund_issue
+Please process my refund,refund_issue
+Refund processing time,refund_issue
+Why is my refund delayed,refund_issue
+Refund inquiry,refund_issue
+Credit my refund amount,refund_issue
+Refund support request,refund_issue
+Refund has not arrived,refund_issue
+Waiting for refund confirmation,refund_issue
+Refund transaction issue,refund_issue
+Need refund details,refund_issue
+Refund taking too long,refund_issue
+When is refund expected,refund_issue
+Refund assistance needed,refund_issue
+Follow up on refund,refund_issue
+Refund still not credited,refund_issue
+Money back request,refund_issue
+I want a refund,refund_issue
+How do I get a refund,refund_issue
+My refund not processed,refund_issue
+Track my refund,refund_issue
+Refund status update,refund_issue
+When will refund be credited,refund_issue
+Refund delay issue,refund_issue
+I need my money back,refund_issue
+Refund for cancelled order,refund_issue
+Refund not received yet,refund_issue
+Where is my refund,refund_issue
+Refund still pending,refund_issue
+Money not credited,refund_issue
+Return my payment,refund_issue
+Please process my refund,refund_issue
+Refund processing time,refund_issue
+Why is my refund delayed,refund_issue
+Refund inquiry,refund_issue
+Credit my refund amount,refund_issue
+Refund support request,refund_issue
+Refund has not arrived,refund_issue
+Waiting for refund confirmation,refund_issue
+Refund transaction issue,refund_issue
+Need refund details,refund_issue
+Refund taking too long,refund_issue
+When is refund expected,refund_issue
+Refund assistance needed,refund_issue
+Follow up on refund,refund_issue
+Refund still not credited,refund_issue
+Money back request,refund_issue
+I want a refund,refund_issue
+How do I get a refund,refund_issue
+My refund not processed,refund_issue
+Track my refund,refund_issue
+Refund status update,refund_issue
+When will refund be credited,refund_issue
+Refund delay issue,refund_issue
+I need my money back,refund_issue
+Refund for cancelled order,refund_issue
+Refund not received yet,refund_issue
+My item is damaged,complaint
+Package arrived broken,complaint
+Delivery is late,complaint
+Product not working,complaint
+Very bad service,complaint
+Courier was rude,complaint
+Item missing from box,complaint
+Shipment arrived late,complaint
+Received wrong item,complaint
+Terrible experience,complaint
+Product defective,complaint
+Service was poor,complaint
+Wrong product delivered,complaint
+Delay in delivery,complaint
+Parcel damaged during transit,complaint
+Late delivery again,complaint
+Delivery was extremely slow,complaint
+Missing items in package,complaint
+Poor delivery experience,complaint
+Unsatisfactory delivery service,complaint
+Order damaged in transit,complaint
+Delivery was not on time,complaint
+Faulty product received,complaint
+Product arrived scratched,complaint
+Incorrect item sent,complaint
+Unacceptable delivery delay,complaint
+Bad customer service,complaint
+Shipment issue complaint,complaint
+Product arrived in bad condition,complaint
+Delivery delay problem,complaint
+My item is damaged,complaint
+Package arrived broken,complaint
+Delivery is late,complaint
+Product not working,complaint
+Very bad service,complaint
+Courier was rude,complaint
+Item missing from box,complaint
+Shipment arrived late,complaint
+Received wrong item,complaint
+Terrible experience,complaint
+Product defective,complaint
+Service was poor,complaint
+Wrong product delivered,complaint
+Delay in delivery,complaint
+Parcel damaged during transit,complaint
+Late delivery again,complaint
+Delivery was extremely slow,complaint
+Missing items in package,complaint
+Poor delivery experience,complaint
+Unsatisfactory delivery service,complaint
+Order damaged in transit,complaint
+Delivery was not on time,complaint
+Faulty product received,complaint
+Product arrived scratched,complaint
+Incorrect item sent,complaint
+Unacceptable delivery delay,complaint
+Bad customer service,complaint
+Shipment issue complaint,complaint
+Product arrived in bad condition,complaint
+Delivery delay problem,complaint
+My item is damaged,complaint
+Package arrived broken,complaint
+Delivery is late,complaint
+Product not working,complaint
+Very bad service,complaint
+Courier was rude,complaint
+Item missing from box,complaint
+Shipment arrived late,complaint
+Received wrong item,complaint
+Terrible experience,complaint
+Product defective,complaint
+Service was poor,complaint
+Wrong product delivered,complaint
+Delay in delivery,complaint
+Parcel damaged during transit,complaint
+Late delivery again,complaint
+Delivery was extremely slow,complaint
+Missing items in package,complaint
+Poor delivery experience,complaint
+Unsatisfactory delivery service,complaint
+Order damaged in transit,complaint
+Delivery was not on time,complaint
+Faulty product received,complaint
+Product arrived scratched,complaint
+Incorrect item sent,complaint
+Unacceptable delivery delay,complaint
+Bad customer service,complaint
+Shipment issue complaint,complaint
+Product arrived in bad condition,complaint
+Delivery delay problem,complaint
+My item is damaged,complaint
+Package arrived broken,complaint
+Delivery is late,complaint
+Product not working,complaint
+Very bad service,complaint
+Courier was rude,complaint
+Item missing from box,complaint
+Shipment arrived late,complaint
+Received wrong item,complaint
+Terrible experience,complaint
