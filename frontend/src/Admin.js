@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, Legend
@@ -29,27 +29,27 @@ const weeklyData = [
   { name: 'Sun', orders: 349, resolved: 430, escalated: 8 },
 ];
 
-/* ===========================
-   COMPONENT
-=========================== */
-
 function Admin() {
   const [tickets, setTickets] = useState([]);
   const [metrics, setMetrics] = useState(null);
 
   const token = localStorage.getItem("token");
 
+  const logout = useCallback(() => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }, []);
+
   const authHeaders = {
-    "Authorization": `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     "Content-Type": "application/json"
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
+  /* ===========================
+     FETCH FUNCTIONS (FIXED)
+  =========================== */
 
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
     try {
       const res = await fetch(`${BASE_URL}/tickets`, { headers: authHeaders });
 
@@ -63,9 +63,9 @@ function Admin() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [logout, token]);
 
-  const fetchMetrics = async () => {
+  const fetchMetrics = useCallback(async () => {
     try {
       const res = await fetch(`${BASE_URL}/admin/metrics`, { headers: authHeaders });
 
@@ -79,7 +79,7 @@ function Admin() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [logout, token]);
 
   const approveTicket = async (ticketId) => {
     await fetch(`${BASE_URL}/admin/approve/${ticketId}`, {
@@ -99,6 +99,10 @@ function Admin() {
     fetchMetrics();
   };
 
+  /* ===========================
+     EFFECT (CI SAFE)
+  =========================== */
+
   useEffect(() => {
     if (!token) {
       logout();
@@ -107,7 +111,11 @@ function Admin() {
 
     fetchTickets();
     fetchMetrics();
-  }, []);
+  }, [token, logout, fetchTickets, fetchMetrics]);
+
+  /* ===========================
+     UI HELPERS
+  =========================== */
 
   const getStatusBadge = (status) => {
     switch(status) {
@@ -119,10 +127,13 @@ function Admin() {
     }
   };
 
+  /* ===========================
+     UI
+  =========================== */
+
   return (
     <div className="dashboard-container">
 
-      {/* HEADER */}
       <header className="dashboard-header">
         <div className="header-title">
           <Activity className="icon-large text-primary" />
@@ -133,7 +144,6 @@ function Admin() {
         </button>
       </header>
 
-      {/* METRICS */}
       {metrics && (
         <div className="metrics-grid">
 
@@ -180,44 +190,6 @@ function Admin() {
         </div>
       )}
 
-      {/* CHARTS */}
-      <div className="charts-grid">
-
-        <div className="chart-card">
-          <h3>Weekly AI Resolution vs Escalation</h3>
-          <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="resolved" fill="#10b981" radius={[4,4,0,0]} />
-                <Bar dataKey="escalated" fill="#f59e0b" radius={[4,4,0,0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="chart-card">
-          <h3>Logistics Volume Trend</h3>
-          <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Line type="monotone" dataKey="orders" stroke="#3b82f6" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-      </div>
-
-      {/* TICKETS TABLE */}
       <div className="table-card">
         <h3>Recent Support Tickets</h3>
 
