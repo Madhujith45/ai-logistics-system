@@ -23,12 +23,15 @@ from app.database import (
 app = FastAPI(title="LogiAI - Logistics AI Backend")
 
 # -----------------------------------
-# CORS CONFIGURATION
+# CORS CONFIGURATION (FIXED)
 # -----------------------------------
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",                      # Local frontend
+        "https://ai-logistics-system.vercel.app"     # Production frontend
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
