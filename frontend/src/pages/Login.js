@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "https://ai-logistics-system.onrender.com";
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 function Login({ setToken }) {
   const [username, setUsername] = useState("");

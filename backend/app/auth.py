@@ -42,3 +42,38 @@ def decode_token(token: str):
         return payload
     except JWTError:
         return None
+
+
+# -----------------------------------
+# Multi-user Authentication (Appended)
+# -----------------------------------
+
+def authenticate_customer(email: str, password: str):
+    """Authenticate a customer user from the database."""
+    from app.database import get_user_by_email
+    user = get_user_by_email(email)
+    if not user:
+        return None
+    if not verify_password(password, user["password_hash"]):
+        return None
+    return user
+
+
+def create_user_token(user: dict):
+    """Create a JWT token for a customer user."""
+    return create_access_token(
+        data={
+            "sub": user["email"],
+            "user_id": user["id"],
+            "name": user["name"],
+            "role": user["role"],
+        }
+    )
+
+
+def get_current_user(token: str):
+    """Decode token and return user info. Works for both admin and customer."""
+    payload = decode_token(token)
+    if not payload:
+        return None
+    return payload
