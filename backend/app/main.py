@@ -15,6 +15,7 @@ from app.policy_engine import handle_cancellation, apply_policy
 from app.order_service import get_order
 from app.response_generator import generate_professional_response
 from app.database import (
+    init_db,
     create_ticket,
     get_all_tickets,
     get_pending_tickets,
@@ -53,6 +54,17 @@ app.add_middleware(
 )
 
 # -----------------------------------
+# Startup: initialise database + seed
+# -----------------------------------
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
+    from app.seed_data import seed_all
+    seed_all()
+
+
+# -----------------------------------
 # OAuth2 Scheme
 # -----------------------------------
 
@@ -81,7 +93,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
 
     access_token = create_access_token(
-        data={"sub": user["username"], "role": user["role"]}
+        data={"sub": user["username"], "role": user["role"], "user_id": user.get("user_id")}
     )
 
     return {
@@ -129,18 +141,32 @@ def chat(request: ChatRequest):
     success_flag = auto_processed
     ticket_status = "ESCALATED"
     order = None
-    payment_mode = None
-    order_status_val = None
-    delivery_date = None
-    refund_status = None
     escalation_reason = None
+
+    # Step 1b: Handle greetings — auto-resolve without escalation
+    GREETINGS = {"hi", "hey", "hello", "hii", "hiii", "heyy", "yo", "sup", "good morning", "good afternoon", "good evening"}
+    if request.text.strip().lower() in GREETINGS:
+        message = (
+            "👋 Hello! Welcome to LogiAI Support.\n\n"
+            "I can help you with:\n"
+            "• 📦 Track your order\n"
+            "• ❌ Cancel an order\n"
+            "• 💳 Request a refund\n\n"
+            "Just type your query or provide your Order ID to get started!"
+        )
+        intent = "GREETING"
+        ticket_status = "AUTO_RESOLVED"
+        success_flag = True
 
     # Step 2: Fetch order if order_id is provided
     if request.order_id:
         order = get_order(request.order_id)
 
     # Step 3: Apply the enhanced policy engine if we have an order
-    if order and intent in [
+    if intent == "GREETING":
+        pass  # Already handled above
+
+    elif order and intent in [
         "TRACK_ORDER", "CANCEL_ORDER", "REFUND_REQUEST",
         "DAMAGED_PRODUCT", "MISMATCH_PRODUCT"
     ]:
@@ -149,12 +175,6 @@ def chat(request: ChatRequest):
         ticket_status = policy_result.get("status", "ESCALATED")
         success_flag = policy_result.get("auto_processed", False)
         escalation_reason = policy_result.get("escalation_reason")
-
-        # Extract order metadata for ticket
-        payment_mode = order.get("payment_mode")
-        order_status_val = order.get("order_status", order.get("status"))
-        delivery_date = order.get("delivery_date")
-        refund_status = policy_result.get("refund_details", {}).get("refund_method") if intent == "REFUND_REQUEST" else None
 
     else:
         # ------- ORIGINAL LOGIC (preserved for backward compat) -------
@@ -171,7 +191,7 @@ def chat(request: ChatRequest):
         elif intent in ["ORDER_CANCELLATION", "CANCEL_ORDER"]:
             if not request.order_id:
                 message = "To process your cancellation request, please provide your Order ID."
-                success_flag = False
+                ticket_status = "IN_PROGRESS"  # Bot is handling — not escalated
             else:
                 cancellation_result = handle_cancellation(request.order_id)
                 message = cancellation_result["message"]
@@ -180,7 +200,7 @@ def chat(request: ChatRequest):
         elif intent in ["ORDER_STATUS", "TRACK_ORDER"]:
             if not request.order_id:
                 message = "To track your order, please provide your Order ID."
-                success_flag = False
+                ticket_status = "IN_PROGRESS"  # Bot is handling — not escalated
             else:
                 fetched_order = get_order(request.order_id)
                 if not fetched_order:
@@ -195,22 +215,35 @@ def chat(request: ChatRequest):
         elif intent == "REFUND_REQUEST":
             if not request.order_id:
                 message = "To process your refund request, please provide your Order ID."
-                success_flag = False
+                ticket_status = "IN_PROGRESS"  # Bot is handling — not escalated
             else:
-                message = (
-                    "We've received your refund request. "
-                    "Please provide your Order ID so we can check eligibility."
-                )
-                success_flag = False
+                fetched_order = get_order(request.order_id)
+                if not fetched_order:
+                    message = "We couldn't find an order with that ID. Please double-check and try again."
+                    success_flag = False
+                else:
+                    policy_result = apply_policy(intent, fetched_order, confidence=confidence, return_reason=getattr(request, 'return_reason', None))
+                    message = generate_professional_response(intent, policy_result, fetched_order)
+                    ticket_status = policy_result.get("status", "ESCALATED")
+                    success_flag = policy_result.get("auto_processed", False)
+                    escalation_reason = policy_result.get("escalation_reason")
 
         elif intent in ["DAMAGED_PRODUCT", "MISMATCH_PRODUCT"]:
-            message = (
-                "We are sorry to hear about the issue with your order. "
-                "A replacement request has been initiated. "
-                "Please upload images via the support portal within 48 hours."
-            )
-            success_flag = False
-            escalation_reason = f"{intent} reported"
+            if not request.order_id:
+                label = "damaged product" if intent == "DAMAGED_PRODUCT" else "wrong/mismatched product"
+                message = f"We're sorry to hear you received a {label}. To proceed, please provide your Order ID so we can look up your order."
+                ticket_status = "IN_PROGRESS"  # Bot is handling — not escalated
+            else:
+                fetched_order = get_order(request.order_id)
+                if not fetched_order:
+                    message = "We couldn't find an order with that ID. Please double-check and try again."
+                    success_flag = False
+                else:
+                    policy_result = apply_policy(intent, fetched_order, confidence=confidence, return_reason=getattr(request, 'return_reason', None))
+                    message = generate_professional_response(intent, policy_result, fetched_order)
+                    ticket_status = policy_result.get("status", "ESCALATED")
+                    success_flag = policy_result.get("auto_processed", False)
+                    escalation_reason = policy_result.get("escalation_reason")
 
         else:
             message = (
@@ -221,28 +254,19 @@ def chat(request: ChatRequest):
             success_flag = False
             escalation_reason = "Unrecognized intent"
 
-        ticket_status = "AUTO_RESOLVED" if success_flag else "ESCALATED"
+        # Only override ticket_status if it wasn't already set (e.g. IN_PROGRESS)
+        if ticket_status == "ESCALATED":
+            ticket_status = "AUTO_RESOLVED" if success_flag else "ESCALATED"
 
     # Step 4: Map ticket_status — ensure backward compatible values
     db_status = ticket_status
     if ticket_status == "ESCALATED":
         db_status = "PENDING_ADMIN"
 
-    # Step 5: Save user message to conversation history
+    # Step 5: Resolve user_id
     user_id = getattr(request, 'user_id', None)
-    session_id = getattr(request, 'session_id', None)
 
-    if session_id:
-        save_conversation_message(
-            user_id=user_id,
-            session_id=session_id,
-            ticket_id=None,  # will be updated after ticket creation
-            sender="user",
-            message=request.text,
-            intent=None,
-        )
-
-    # Step 6: Create ticket
+    # Step 6: Create ticket (AI query log)
     ticket = create_ticket({
         "text": request.text,
         "order_id": request.order_id,
@@ -250,32 +274,16 @@ def chat(request: ChatRequest):
         "confidence": confidence,
         "status": db_status,
         "message": message,
-        "payment_mode": payment_mode,
-        "order_status": order_status_val,
-        "delivery_date": delivery_date,
-        "refund_status": refund_status,
         "user_id": user_id,
         "escalation_reason": escalation_reason,
-        "return_reason": getattr(request, 'return_reason', None),
     })
 
-    # Step 7: Save bot response to conversation history
-    if session_id:
-        save_conversation_message(
-            user_id=user_id,
-            session_id=session_id,
-            ticket_id=ticket["ticket_id"],
-            sender="bot",
-            message=message,
-            intent=intent,
-        )
-
-    # Step 8: Return backward-compatible response
+    # Step 7: Return backward-compatible response
     return {
         "ticket_id": ticket["ticket_id"],
         "intent": intent,
         "confidence": confidence,
-        "status": "AUTO_RESOLVED" if success_flag else "ESCALATED",
+        "status": db_status,
         "message": message
     }
 

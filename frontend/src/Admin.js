@@ -204,6 +204,8 @@ function Admin() {
     switch (status) {
       case "AUTO_RESOLVED":
         return <span className="badge badge-success">Auto Resolved</span>;
+      case "IN_PROGRESS":
+        return <span className="badge badge-info">In Progress</span>;
       case "PENDING_ADMIN":
         return <span className="badge badge-warning">Pending Admin</span>;
       case "APPROVED":
@@ -231,51 +233,89 @@ function Admin() {
       {metrics && (
         <div className="metrics-grid">
           <div className="metric-card">
-            <Package />
-            <h3>{metrics.total_tickets}</h3>
-            <p>Total Tickets</p>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(37,99,235,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Package size={24} color="#2563EB" />
+            </div>
+            <div>
+              <h3>{metrics.total_tickets}</h3>
+              <p>Total Tickets</p>
+            </div>
           </div>
           <div className="metric-card">
-            <CheckCircle />
-            <h3>{metrics.auto_resolved}</h3>
-            <p>Auto Resolved</p>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <CheckCircle size={24} color="#34d399" />
+            </div>
+            <div>
+              <h3>{metrics.auto_resolved}</h3>
+              <p>Auto Resolved</p>
+            </div>
           </div>
           <div className="metric-card">
-            <AlertCircle />
-            <h3>{metrics.pending_escalations}</h3>
-            <p>Pending Escalations</p>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(245,158,11,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <AlertCircle size={24} color="#fbbf24" />
+            </div>
+            <div>
+              <h3>{metrics.pending_escalations}</h3>
+              <p>Pending Escalations</p>
+            </div>
           </div>
           <div className="metric-card">
-            <TrendingUp />
-            <h3>{metrics.escalation_rate_percent}%</h3>
-            <p>Escalation Rate</p>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(167,139,250,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <TrendingUp size={24} color="#a78bfa" />
+            </div>
+            <div>
+              <h3>{metrics.escalation_rate_percent}%</h3>
+              <p>Escalation Rate</p>
+            </div>
           </div>
         </div>
       )}
 
-      {/* CHARTS (kept intentionally to avoid unused imports) */}
+      {/* Analytics Charts */}
       <div className="charts-grid">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={weeklyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="resolved" fill="#10b981" />
-            <Bar dataKey="escalated" fill="#f59e0b" />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="table-card" style={{ padding: 0 }}>
+          <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <BarChart width={16} height={16} /> Resolution Overview
+          </h3>
+          <div style={{ padding: "0 16px 16px" }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={weeklyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="name" stroke="var(--text-muted)" />
+                <YAxis stroke="var(--text-muted)" />
+                <Tooltip
+                  contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
+                  labelStyle={{ color: "var(--text-primary)" }}
+                  itemStyle={{ color: "var(--text-secondary)" }}
+                />
+                <Legend />
+                <Bar dataKey="resolved" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="escalated" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={weeklyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="orders" stroke="#3b82f6" />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="table-card" style={{ padding: 0 }}>
+          <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Activity size={16} /> Weekly Order Trend
+          </h3>
+          <div style={{ padding: "0 16px 16px" }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={weeklyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="name" stroke="var(--text-muted)" />
+                <YAxis stroke="var(--text-muted)" />
+                <Tooltip
+                  contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
+                  labelStyle={{ color: "var(--text-primary)" }}
+                  itemStyle={{ color: "var(--text-secondary)" }}
+                />
+                <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} dot={{ fill: "#2563EB", r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
 
       <div className="table-card">
@@ -326,6 +366,8 @@ function Admin() {
                         <button onClick={() => approveTicket(ticket.ticket_id)}>Approve</button>
                         <button onClick={() => rejectTicket(ticket.ticket_id)}>Reject</button>
                       </>
+                    ) : ticket.status === "IN_PROGRESS" ? (
+                      <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>Awaiting Info</span>
                     ) : (
                       "Resolved"
                     )}

@@ -60,3 +60,7 @@ frontend/dist/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test / utility files
+Example chat queries to test.txt
+backend/view_db.py

@@ -124,12 +124,37 @@ def _handle_tracking(order: dict) -> dict:
     delivery_date = order.get("delivery_date")
 
     status_messages = {
-        "Placed": f"Your order #{order_id} for {product_name} has been placed and is being prepared for dispatch.",
-        "Processing": f"Your order #{order_id} for {product_name} is currently being processed. Expected dispatch within 1-2 business days.",
-        "Shipped": f"Your order #{order_id} for {product_name} has been shipped! You will receive tracking details via email shortly.",
-        "Out for Delivery": f"Great news! Your order #{order_id} for {product_name} is out for delivery and will arrive today.",
-        "Delivered": f"Your order #{order_id} for {product_name} was delivered on {delivery_date or 'a recent date'}. We hope you enjoy your purchase!",
-        "Cancelled": f"Your order #{order_id} for {product_name} has been cancelled. If you did not request this, please contact our support team.",
+        "Placed": (
+            f"📤 Order Dispatched!\n\n"
+            f"Your order #{order_id} for {product_name} has been placed and is being prepared for dispatch.\n"
+            f"📦 We'll notify you once it ships."
+        ),
+        "Processing": (
+            f"🛠 Order Processing\n\n"
+            f"Your order #{order_id} for {product_name} is currently being processed.\n"
+            f"⏳ Expected dispatch within 1–2 business days."
+        ),
+        "Shipped": (
+            f"🚛 In Transit\n\n"
+            f"Your order #{order_id} for {product_name} has been shipped and is on its way!\n"
+            f"📧 You will receive tracking details via email shortly."
+        ),
+        "Out for Delivery": (
+            f"🚚 Out for Delivery!\n\n"
+            f"Great news! Your order #{order_id} for {product_name} is out for delivery.\n"
+            f"📍 It will arrive today — please ensure someone is available to receive it."
+        ),
+        "Delivered": (
+            f"📦 Delivered Successfully!\n\n"
+            f"Your order #{order_id} for {product_name} was delivered on {delivery_date or 'a recent date'}.\n"
+            f"✅ We hope you enjoy your purchase! If you have any concerns, feel free to reach out."
+        ),
+        "Cancelled": (
+            f"❌ Order Cancelled\n\n"
+            f"Your order #{order_id} for {product_name} has been cancelled.\n"
+            f"💳 If a payment was made, a refund will be initiated within 5–7 business days.\n"
+            f"If you did not request this, please contact our support team immediately."
+        ),
     }
 
     message = status_messages.get(

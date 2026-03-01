@@ -462,59 +462,74 @@ function UserPage() {
         </div>
       </div>
 
-      {/* Auth Panel (slide-down) */}
+      {/* Auth Panel — Card Style */}
       {showAuthPanel && !userProfile && (
-        <div className="auth-panel">
-          <div className="auth-tabs">
-            <button
-              className={`auth-tab ${authMode === "login" ? "active" : ""}`}
-              onClick={() => { setAuthMode("login"); setAuthError(""); }}
-            >
-              Sign In
-            </button>
-            <button
-              className={`auth-tab ${authMode === "register" ? "active" : ""}`}
-              onClick={() => { setAuthMode("register"); setAuthError(""); }}
-            >
-              Register
-            </button>
-          </div>
-          <form className="auth-form" onSubmit={handleAuth}>
-            {authMode === "register" && (
+        <div className="auth-overlay" onClick={() => setShowAuthPanel(false)}>
+          <div className="auth-card" onClick={(e) => e.stopPropagation()}>
+            <div style={{ textAlign: "center", marginBottom: 8 }}>
+              <div className="auth-card-icon">
+                {authMode === "register" ? <UserPlus size={28} /> : <LogIn size={28} />}
+              </div>
+            </div>
+            <h2 className="auth-card-title">{authMode === "register" ? "Create Account" : "Sign In"}</h2>
+            <p className="auth-card-subtitle">
+              {authMode === "register"
+                ? "Register to track orders and get personalized support"
+                : "Sign in to access your orders and support history"}
+            </p>
+
+            <div className="auth-tabs">
+              <button
+                className={`auth-tab ${authMode === "login" ? "active" : ""}`}
+                onClick={() => { setAuthMode("login"); setAuthError(""); }}
+              >
+                Sign In
+              </button>
+              <button
+                className={`auth-tab ${authMode === "register" ? "active" : ""}`}
+                onClick={() => { setAuthMode("register"); setAuthError(""); }}
+              >
+                Register
+              </button>
+            </div>
+
+            <form className="auth-form" onSubmit={handleAuth}>
+              {authMode === "register" && (
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={authForm.name}
+                  onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                  required
+                />
+              )}
               <input
-                type="text"
-                placeholder="Full Name"
-                value={authForm.name}
-                onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                type="email"
+                placeholder="Email Address"
+                value={authForm.email}
+                onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
                 required
               />
-            )}
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={authForm.email}
-              onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={authForm.password}
-              onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-              required
-            />
-            {authError && <p className="auth-error">{authError}</p>}
-            <button type="submit" className="auth-submit-btn" disabled={authLoading}>
-              {authLoading
-                ? "Please wait..."
-                : authMode === "register"
-                ? "Create Account"
-                : "Sign In"}
+              <input
+                type="password"
+                placeholder="Password"
+                value={authForm.password}
+                onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                required
+              />
+              {authError && <p className="auth-error">{authError}</p>}
+              <button type="submit" className="auth-submit-btn" disabled={authLoading}>
+                {authLoading
+                  ? "Please wait..."
+                  : authMode === "register"
+                  ? "Create Account"
+                  : "Sign In"}
+              </button>
+            </form>
+            <button className="auth-close-btn" onClick={() => setShowAuthPanel(false)}>
+              Skip — Continue as Guest
             </button>
-          </form>
-          <button className="auth-close-btn" onClick={() => setShowAuthPanel(false)}>
-            Skip — Continue as Guest
-          </button>
+          </div>
         </div>
       )}
 

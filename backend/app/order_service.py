@@ -1,97 +1,66 @@
 # app/order_service.py
 
-# -----------------------------------
-# Realistic Mock Order Database
-# -----------------------------------
+"""
+Order service — fetches and mutates orders from the database.
+No hardcoded order data; everything is read from SQLite / PostgreSQL.
+"""
 
-mock_orders = {
-    "123": {
-        "order_id": "123",
-        "customer_name": "Rahul Sharma",
-        "product_name": "iPhone 13",
-        "payment_mode": "UPI",
-        "order_status": "Processing",
-        "status": "Processing",
-        "shipped": False,
-        "delivery_date": None,
-        "price": 59999,
-        "return_window_days": 7,
-    },
-    "456": {
-        "order_id": "456",
-        "customer_name": "Priya Patel",
-        "product_name": "Samsung Galaxy S23",
-        "payment_mode": "CARD",
-        "order_status": "Shipped",
-        "status": "Shipped",
-        "shipped": True,
-        "delivery_date": None,
-        "price": 74999,
-        "return_window_days": 7,
-    },
-    "789": {
-        "order_id": "789",
-        "customer_name": "Amit Verma",
-        "product_name": "Sony WH-1000XM5 Headphones",
-        "payment_mode": "COD",
-        "order_status": "Delivered",
-        "status": "Delivered",
-        "shipped": True,
-        "delivery_date": "2026-02-20",
-        "price": 29990,
-        "return_window_days": 7,
-    },
-    "1001": {
-        "order_id": "1001",
-        "customer_name": "Neha Gupta",
-        "product_name": "MacBook Air M2",
-        "payment_mode": "NET_BANKING",
-        "order_status": "Delivered",
-        "status": "Delivered",
-        "shipped": True,
-        "delivery_date": "2026-01-10",
-        "price": 114990,
-        "return_window_days": 7,
-    },
-    "1002": {
-        "order_id": "1002",
-        "customer_name": "Vikram Singh",
-        "product_name": "Nike Air Max 270",
-        "payment_mode": "WALLET",
-        "order_status": "Placed",
-        "status": "Placed",
-        "shipped": False,
-        "delivery_date": None,
-        "price": 12995,
-        "return_window_days": 7,
-    },
-    "1003": {
-        "order_id": "1003",
-        "customer_name": "Ananya Reddy",
-        "product_name": "Kindle Paperwhite",
-        "payment_mode": "UPI",
-        "order_status": "Out for Delivery",
-        "status": "Out for Delivery",
-        "shipped": True,
-        "delivery_date": None,
-        "price": 13999,
-        "return_window_days": 7,
-    },
-}
+from app.database import SessionLocal
 
 
-def get_order(order_id: str):
-    return mock_orders.get(order_id)
+def get_order(order_id: str) -> dict | None:
+    """
+    Look up an order by its string order_id.
+    Returns a dict compatible with the policy engine, or None.
+    """
+    from app.models import Order
+
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.order_id == order_id).first()
+        if not order:
+            return None
+
+        shipped_statuses = {"Shipped", "Out for Delivery", "Delivered"}
+
+        return {
+            "order_id": order.order_id,
+            "customer_name": order.customer_name,
+            "product_name": order.product_name or "your item",
+            "payment_mode": order.payment_mode,
+            "order_status": order.status,
+            "status": order.status,
+            "shipped": order.status in shipped_statuses,
+            "delivery_date": order.delivery_date,
+            "price": order.price,
+            "return_window_days": order.return_window_days or 7,
+        }
+    finally:
+        db.close()
 
 
-def cancel_order(order_id: str):
-    order = get_order(order_id)
-    if not order:
-        return {"success": False, "message": "Order not found"}
+def cancel_order(order_id: str) -> dict:
+    """
+    Cancel an order in the database if it hasn't shipped yet.
+    """
+    from app.models import Order
 
-    if order["shipped"]:
-        return {"success": False, "message": "Order already shipped. Cannot cancel."}
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.order_id == order_id).first()
+        if not order:
+            return {"success": False, "message": "Order not found"}
 
-    order["status"] = "Cancelled"
-    order["order_status"] = "Cancelled"
-    return {"success": True, "message": "Order cancelled successfully"}
+        shipped_statuses = {"Shipped", "Out for Delivery", "Delivered"}
+        if order.status in shipped_statuses:
+            return {"success": False, "message": "Order already shipped. Cannot cancel."}
+
+        order.status = "Cancelled"
+        db.commit()
+        return {"success": True, "message": "Order cancelled successfully"}
+    except Exception:
+        db.rollback()
+        return {"success": False, "message": "Failed to cancel order"}
+    finally:
+        db.close()
+
