@@ -242,9 +242,3 @@ The frontend will be available at `http://localhost:3000`
 2. Set **Root Directory:** `frontend`
 3. Set **Build Command:** `npm run build`
 4. Add environment variable: `REACT_APP_API_URL` = your Render backend URL
-
----
-
-## License
-
-This project is built for academic purposes as a final-year project.
