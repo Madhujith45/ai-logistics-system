@@ -1,10 +1,11 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import bcrypt
+import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
-SECRET_KEY = "supersecretkey"  # change in production
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")  # Set via environment variable in production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
