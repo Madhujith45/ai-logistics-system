@@ -186,11 +186,12 @@ The frontend will be available at `http://localhost:3000`
 > _Add screenshots of the application here_
 
 <!-- 
-Place your screenshots in a /screenshots folder and reference them like:
-![Chat Interface](screenshots/chat.png)
-![Admin Dashboard](screenshots/admin.png)
-![Dark Mode](screenshots/dark-mode.png)
-![Track Order](screenshots/track-order.png)
+<img width="1919" height="919" alt="image" src="https://github.com/user-attachments/assets/0c36b482-ea2b-4b7b-930c-f36e244853bb" />
+<img width="1919" height="906" alt="image" src="https://github.com/user-attachments/assets/7689b917-a9b2-4aff-86e5-ef63ce608146" />
+<img width="925" height="789" alt="image" src="https://github.com/user-attachments/assets/07d915d0-f6a8-48c5-80bf-29161f1da4bb" />
+
+
+
 -->
 
 ---
