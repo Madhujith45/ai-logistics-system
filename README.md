@@ -8,8 +8,8 @@ An intelligent customer support system for logistics and e-commerce, powered by 
 
 | Service  | URL |
 |----------|-----|
-| Frontend | _Add your Vercel URL here_ |
-| Backend  | _Add your Render URL here_ |
+| Frontend |https://ai-logistics-system.vercel.app/ |
+| Backend  |https://ai-logistics-system.onrender.com/|
 
 ---
 
