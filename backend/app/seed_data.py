@@ -267,6 +267,116 @@ SAMPLE_ORDERS = [
     },
 ]
 
+# ──────────────────────────────────────────────
+# Demo Tickets (pre-populated for admin dashboard)
+# ──────────────────────────────────────────────
+
+SAMPLE_TICKETS = [
+    {
+        "user_query": "Where is my order ORD-1001?",
+        "order_id": "ORD-1001",
+        "intent_detected": "TRACK_ORDER",
+        "confidence": 0.96,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "📦 Your order ORD-1001 (iPhone 15 Pro Max) is currently being **Processing** 🛠️.\n\n📍 Route: Mumbai Warehouse → Delhi, India\n📅 Expected Delivery: 2026-03-08",
+        "owner_email": "rahul@logiai.com",
+        "minutes_ago": 5,
+    },
+    {
+        "user_query": "I want to cancel order ORD-1002",
+        "order_id": "ORD-1002",
+        "intent_detected": "CANCEL_ORDER",
+        "confidence": 0.94,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "✅ Your order **ORD-1002** (Samsung Galaxy S24 Ultra) has been **cancelled** successfully.\n\n💰 Refund of ₹134999 will be credited to your Credit Card within 5-7 business days.",
+        "owner_email": "rahul@logiai.com",
+        "minutes_ago": 12,
+    },
+    {
+        "user_query": "Track my order ORD-2001",
+        "order_id": "ORD-2001",
+        "intent_detected": "TRACK_ORDER",
+        "confidence": 0.98,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "📦 Your order ORD-2001 (MacBook Air M3) is currently **Shipped** 🚛.\n\n📍 Route: Delhi Warehouse → Jaipur, India\n📅 Expected Delivery: 2026-03-05",
+        "owner_email": "priya@logiai.com",
+        "minutes_ago": 25,
+    },
+    {
+        "user_query": "I received a damaged product for ORD-2004",
+        "order_id": "ORD-2004",
+        "intent_detected": "DAMAGED_PRODUCT",
+        "confidence": 0.91,
+        "status": "PENDING_ADMIN",
+        "ai_response": "I'm sorry to hear about the damaged product. Your case has been escalated to our support team for immediate review.",
+        "escalation_reason": "Damaged product reported — requires admin verification",
+        "owner_email": "priya@logiai.com",
+        "minutes_ago": 40,
+    },
+    {
+        "user_query": "Where is ORD-3001?",
+        "order_id": "ORD-3001",
+        "intent_detected": "TRACK_ORDER",
+        "confidence": 0.95,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "📦 Your order ORD-3001 (Sony WH-1000XM5) is **Out for Delivery** 🚚.\n\n📍 Route: Chennai Hub → Hyderabad, India\n📅 Expected Delivery: 2026-02-28",
+        "owner_email": "amit@logiai.com",
+        "minutes_ago": 55,
+    },
+    {
+        "user_query": "I want a refund for ORD-3004",
+        "order_id": "ORD-3004",
+        "intent_detected": "REFUND_REQUEST",
+        "confidence": 0.92,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "✅ Your refund request for **ORD-3004** (JBL Flip 6 Speaker) has been approved.\n\n💰 Refund of ₹11999 will be credited to your UPI account within 3-5 business days.",
+        "owner_email": "amit@logiai.com",
+        "minutes_ago": 70,
+    },
+    {
+        "user_query": "Cancel ORD-2003 please",
+        "order_id": "ORD-2003",
+        "intent_detected": "CANCEL_ORDER",
+        "confidence": 0.93,
+        "status": "PENDING_ADMIN",
+        "ai_response": "❌ Sorry, your order **ORD-2003** (Dyson V15 Detect) is already **Out for Delivery** and cannot be cancelled at this stage.",
+        "escalation_reason": "Cancellation denied — order already out for delivery",
+        "owner_email": "priya@logiai.com",
+        "minutes_ago": 90,
+    },
+    {
+        "user_query": "I got the wrong item in ORD-1004",
+        "order_id": "ORD-1004",
+        "intent_detected": "MISMATCH_PRODUCT",
+        "confidence": 0.89,
+        "status": "PENDING_ADMIN",
+        "ai_response": "I'm sorry about the wrong item. Your complaint has been escalated to our team for investigation and resolution.",
+        "escalation_reason": "Product mismatch reported — requires admin review",
+        "owner_email": "rahul@logiai.com",
+        "minutes_ago": 120,
+    },
+    {
+        "user_query": "What is the status of ORD-3005?",
+        "order_id": "ORD-3005",
+        "intent_detected": "TRACK_ORDER",
+        "confidence": 0.97,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "📦 Your order ORD-3005 (Adidas Ultraboost 23) is **Out for Delivery** 🚚.\n\n📍 Route: Bangalore Hub → Kochi, India\n📅 Expected Delivery: 2026-02-28",
+        "owner_email": "amit@logiai.com",
+        "minutes_ago": 150,
+    },
+    {
+        "user_query": "Track ORD-1003",
+        "order_id": "ORD-1003",
+        "intent_detected": "TRACK_ORDER",
+        "confidence": 0.96,
+        "status": "AUTO_RESOLVED",
+        "ai_response": "📦 Your order ORD-1003 (Sony PlayStation 5) has been **Delivered** 📦✅.\n\n📍 Delivered to: Chennai, India\n📅 Delivered on: 2026-02-15",
+        "owner_email": "rahul@logiai.com",
+        "minutes_ago": 180,
+    },
+]
+
 
 # ──────────────────────────────────────────────
 # Seed function
@@ -274,7 +384,7 @@ SAMPLE_ORDERS = [
 
 def seed_all():
     """Insert seed data if the tables are empty. Idempotent."""
-    from app.models import User, Order
+    from app.models import User, Order, Ticket
 
     db = SessionLocal()
     try:
@@ -322,6 +432,30 @@ def seed_all():
             db.add(order)
 
         db.commit()
+
+        # ── Seed demo tickets ────────────────
+        existing_tickets = db.query(Ticket).count()
+        if existing_tickets == 0:
+            now = datetime.utcnow()
+            for tdata in SAMPLE_TICKETS:
+                owner_id = email_to_user_id.get(tdata["owner_email"])
+                ticket = Ticket(
+                    ticket_id=f"DEMO-{SAMPLE_TICKETS.index(tdata)+1:03d}",
+                    user_query=tdata["user_query"],
+                    order_id=tdata["order_id"],
+                    intent_detected=tdata["intent_detected"],
+                    confidence=tdata["confidence"],
+                    status=tdata["status"],
+                    ai_response=tdata["ai_response"],
+                    user_id=owner_id,
+                    escalation_reason=tdata.get("escalation_reason"),
+                    admin_decision=None,
+                    created_at=now - timedelta(minutes=tdata["minutes_ago"]),
+                )
+                db.add(ticket)
+            db.commit()
+            logger.info(f"Seeded {len(SAMPLE_TICKETS)} demo tickets.")
+
         logger.info("Seed data verified / inserted. "
                      f"{len(USERS)} users, {len(SAMPLE_ORDERS)} orders.")
 
