@@ -5,6 +5,8 @@ Order service — fetches and mutates orders from the database.
 No hardcoded order data; everything is read from SQLite / PostgreSQL.
 """
 
+from datetime import datetime, timedelta
+
 from app.database import SessionLocal
 
 
@@ -23,6 +25,16 @@ def get_order(order_id: str) -> dict | None:
 
         shipped_statuses = {"Shipped", "Out for Delivery", "Delivered"}
 
+        # Compute return_deadline from delivery_date + return_window_days
+        return_window_days = order.return_window_days or 7
+        return_deadline = None
+        if order.delivery_date:
+            try:
+                d = datetime.strptime(order.delivery_date, "%Y-%m-%d")
+                return_deadline = (d + timedelta(days=return_window_days)).strftime("%Y-%m-%d")
+            except (ValueError, TypeError):
+                pass
+
         return {
             "order_id": order.order_id,
             "customer_name": order.customer_name,
@@ -33,7 +45,8 @@ def get_order(order_id: str) -> dict | None:
             "shipped": order.status in shipped_statuses,
             "delivery_date": order.delivery_date,
             "price": order.price,
-            "return_window_days": order.return_window_days or 7,
+            "return_window_days": return_window_days,
+            "return_deadline": return_deadline,
         }
     finally:
         db.close()

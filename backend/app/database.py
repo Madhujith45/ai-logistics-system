@@ -321,6 +321,17 @@ def get_user_by_id(user_id: int):
 # CRUD — Orders
 # ──────────────────────────────────────────────
 
+def get_all_orders() -> list:
+    from app.models import Order
+
+    db = SessionLocal()
+    try:
+        orders = db.query(Order).order_by(Order.created_at.desc()).all()
+        return [serialize_order(o) for o in orders]
+    finally:
+        db.close()
+
+
 def get_orders_by_user(user_id: int) -> list:
     from app.models import Order
 

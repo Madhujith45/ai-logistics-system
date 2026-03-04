@@ -26,6 +26,7 @@ from app.database import (
     get_user_by_email,
     get_user_by_id,
     get_orders_by_user,
+    get_all_orders,
     save_conversation_message,
     get_conversation_by_ticket,
     get_user_conversations,
@@ -313,9 +314,16 @@ def reject_ticket(ticket_id: str, payload=Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Ticket not found")
     return ticket
 
+@app.get("/admin/orders")
+def admin_orders(payload=Depends(require_admin)):
+    """Get all orders for admin dashboard."""
+    return get_all_orders()
+
+
 @app.get("/admin/metrics")
 def admin_metrics(payload=Depends(require_admin)):
     tickets = get_all_tickets()
+    orders = get_all_orders()
 
     total = len(tickets)
     auto_resolved = sum(1 for t in tickets if t["status"] == "AUTO_RESOLVED")
@@ -330,6 +338,23 @@ def admin_metrics(payload=Depends(require_admin)):
 
     escalation_rate = (pending / total) * 100 if total else 0
 
+    # Intent distribution for pie chart
+    intent_counts = {}
+    for t in tickets:
+        intent = t.get("intent", "UNKNOWN")
+        intent_counts[intent] = intent_counts.get(intent, 0) + 1
+
+    intent_distribution = [
+        {"name": k.replace("_", " ").title(), "value": v}
+        for k, v in intent_counts.items()
+    ]
+
+    # Order stats
+    total_orders = len(orders)
+    active_shipments = sum(1 for o in orders if o["status"] in ["Processing", "Shipped", "Out for Delivery"])
+    delivered_orders = sum(1 for o in orders if o["status"] == "Delivered")
+    cancelled_orders = sum(1 for o in orders if o["status"] == "Cancelled")
+
     return {
         "total_tickets": total,
         "auto_resolved": auto_resolved,
@@ -337,7 +362,12 @@ def admin_metrics(payload=Depends(require_admin)):
         "approved": approved,
         "rejected": rejected,
         "average_confidence": round(avg_confidence, 3),
-        "escalation_rate_percent": round(escalation_rate, 2)
+        "escalation_rate_percent": round(escalation_rate, 2),
+        "intent_distribution": intent_distribution,
+        "total_orders": total_orders,
+        "active_shipments": active_shipments,
+        "delivered_orders": delivered_orders,
+        "cancelled_orders": cancelled_orders,
     }
 
 

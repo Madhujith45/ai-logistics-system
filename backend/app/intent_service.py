@@ -25,7 +25,7 @@ INTENT_CATEGORIES = {
 
 # Keyword-based fallback classifier for intents not in the spaCy model
 KEYWORD_PATTERNS = {
-    "TRACK_ORDER": ["track", "where is", "status", "order status", "delivery status", "shipping status", "where's my", "when will"],
+    "TRACK_ORDER": ["track", "where is", "status", "order status", "delivery status", "shipping status", "where's my", "when will", "about my order", "tell me about", "my order", "order update", "order info", "check order", "check my order", "update on my order", "any update", "delivery update", "what happened to my order", "how is my order", "order details"],
     "CANCEL_ORDER": ["cancel", "cancellation", "abort", "stop order", "don't want"],
     "REFUND_REQUEST": ["refund", "money back", "return money", "reimburse", "cashback", "get my money"],
     "DAMAGED_PRODUCT": ["damaged", "broken", "defective", "not working", "cracked", "torn", "faulty"],
@@ -61,6 +61,7 @@ KNOWN_INTENTS = {"TRACK_ORDER", "CANCEL_ORDER", "REFUND_REQUEST", "DAMAGED_PRODU
 # High-priority keywords — if these appear, they override the model's guess
 # because users explicitly saying "refund" or "cancel" should never be misclassified
 HIGH_PRIORITY_KEYWORDS = {
+    "TRACK_ORDER": ["about my order", "tell me about my order", "my order", "order update", "check my order", "how is my order", "order details", "where is my order", "order info"],
     "REFUND_REQUEST": ["refund", "money back", "reimburse", "return money", "get my money"],
     "CANCEL_ORDER": ["cancel", "cancellation", "abort order"],
     "DAMAGED_PRODUCT": ["damaged", "broken", "defective", "cracked", "faulty"],

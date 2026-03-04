@@ -2,12 +2,15 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
-  LineChart, Line, Legend
+  LineChart, Line, Legend,
+  PieChart, Pie, Cell
 } from "recharts";
 import {
   Package, AlertCircle, CheckCircle,
   TrendingUp, Activity, LogOut, ShieldAlert,
-  X, FileText, Truck, CreditCard, Calendar, Clock, ShieldCheck
+  X, FileText, Truck, CreditCard, Calendar, Clock, ShieldCheck,
+  LayoutDashboard, TicketIcon, ShoppingCart, BarChart3, Search,
+  MapPin
 } from "lucide-react";
 import "./App.css";
 
@@ -23,11 +26,17 @@ const weeklyData = [
   { name: "Sun", orders: 349, resolved: 230, escalated: 8 },
 ];
 
+const INTENT_COLORS = ["#2563EB", "#ef4444", "#f59e0b", "#10b981", "#8b5cf6", "#06b6d4", "#ec4899"];
+
 function Admin() {
   const [tickets, setTickets] = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [ticketDetail, setTicketDetail] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [detailLoading, setDetailLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [orders, setOrders] = useState([]);
+  const [orderSearch, setOrderSearch] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -73,6 +82,25 @@ function Admin() {
 
       const data = await res.json();
       setMetrics(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [token, logout]);
+
+  const fetchOrders = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      if (res.status === 401 || res.status === 403) {
+        logout();
+        return;
+      }
+      const data = await res.json();
+      setOrders(data);
     } catch (err) {
       console.error(err);
     }
@@ -162,8 +190,8 @@ function Admin() {
         label: "Order Value",
         pass: price <= 50000,
         detail: price > 50000
-          ? `High-value order (\u20B9${price.toLocaleString()}) — requires senior approval`
-          : `\u20B9${price.toLocaleString()} — within auto-approval limit`,
+          ? `High-value order (₹${price.toLocaleString()}) — requires senior approval`
+          : `₹${price.toLocaleString()} — within auto-approval limit`,
       });
     } else if (intent === "CANCEL_ORDER") {
       const cancellable = ["Processing", "Placed"].includes(orderStatus);
@@ -198,7 +226,8 @@ function Admin() {
     }
     fetchTickets();
     fetchMetrics();
-  }, [token, logout, fetchTickets, fetchMetrics]);
+    fetchOrders();
+  }, [token, logout, fetchTickets, fetchMetrics, fetchOrders]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -217,167 +246,434 @@ function Admin() {
     }
   };
 
+  const getOrderStatusBadge = (status) => {
+    const map = {
+      "Placed": { cls: "badge-info", label: "Placed" },
+      "Processing": { cls: "badge-info", label: "Processing" },
+      "Shipped": { cls: "badge-primary", label: "Shipped" },
+      "Out for Delivery": { cls: "badge-warning", label: "Out for Delivery" },
+      "Delivered": { cls: "badge-success", label: "Delivered" },
+      "Cancelled": { cls: "badge-danger", label: "Cancelled" },
+    };
+    const m = map[status] || { cls: "", label: status };
+    return <span className={`badge ${m.cls}`}>{m.label}</span>;
+  };
+
+  const ORDER_STEPS = ["Placed", "Processing", "Shipped", "Out for Delivery", "Delivered"];
+
+  const getStepIndex = (status) => {
+    if (status === "Cancelled") return -1;
+    const idx = ORDER_STEPS.indexOf(status);
+    return idx >= 0 ? idx : 0;
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const q = orderSearch.toLowerCase();
+    if (!q) return true;
+    return (
+      (o.order_id || "").toLowerCase().includes(q) ||
+      (o.customer_name || "").toLowerCase().includes(q) ||
+      (o.product_name || "").toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div className="dashboard-container">
+    <div className="admin-layout">
 
-      <header className="dashboard-header">
-        <div className="header-title">
-          <Activity className="icon-large text-primary" />
-          <h2>Logistics Command Center</h2>
-        </div>
-        <button className="btn-outline" onClick={logout}>
-          <LogOut size={18} /> Logout
-        </button>
-      </header>
-
-      {metrics && (
-        <div className="metrics-grid">
-          <div className="metric-card">
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(37,99,235,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <Package size={24} color="#2563EB" />
-            </div>
-            <div>
-              <h3>{metrics.total_tickets}</h3>
-              <p>Total Tickets</p>
-            </div>
-          </div>
-          <div className="metric-card">
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <CheckCircle size={24} color="#34d399" />
-            </div>
-            <div>
-              <h3>{metrics.auto_resolved}</h3>
-              <p>Auto Resolved</p>
-            </div>
-          </div>
-          <div className="metric-card">
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(245,158,11,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <AlertCircle size={24} color="#fbbf24" />
-            </div>
-            <div>
-              <h3>{metrics.pending_escalations}</h3>
-              <p>Pending Escalations</p>
-            </div>
-          </div>
-          <div className="metric-card">
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(167,139,250,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <TrendingUp size={24} color="#a78bfa" />
-            </div>
-            <div>
-              <h3>{metrics.escalation_rate_percent}%</h3>
-              <p>Escalation Rate</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Analytics Charts */}
-      <div className="charts-grid">
-        <div className="table-card" style={{ padding: 0 }}>
-          <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <BarChart width={16} height={16} /> Resolution Overview
-          </h3>
-          <div style={{ padding: "0 16px 16px" }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                <XAxis dataKey="name" stroke="var(--text-muted)" />
-                <YAxis stroke="var(--text-muted)" />
-                <Tooltip
-                  contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
-                  labelStyle={{ color: "var(--text-primary)" }}
-                  itemStyle={{ color: "var(--text-secondary)" }}
-                />
-                <Legend />
-                <Bar dataKey="resolved" fill="#2563EB" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="escalated" fill="#fbbf24" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+      {/* ── Sidebar ── */}
+      <aside className="admin-sidebar">
+        <div className="sidebar-brand">
+          <Package size={28} className="text-primary" />
+          <div>
+            <h2>LogiAI</h2>
+            <span>Support System</span>
           </div>
         </div>
 
-        <div className="table-card" style={{ padding: 0 }}>
-          <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Activity size={16} /> Weekly Order Trend
-          </h3>
-          <div style={{ padding: "0 16px 16px" }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                <XAxis dataKey="name" stroke="var(--text-muted)" />
-                <YAxis stroke="var(--text-muted)" />
-                <Tooltip
-                  contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
-                  labelStyle={{ color: "var(--text-primary)" }}
-                  itemStyle={{ color: "var(--text-secondary)" }}
-                />
-                <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} dot={{ fill: "#2563EB", r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <nav className="sidebar-nav">
+          <button className={`sidebar-link ${activeTab === "dashboard" ? "active" : ""}`} onClick={() => setActiveTab("dashboard")}>
+            <LayoutDashboard size={18} /> Dashboard
+          </button>
+          <button className={`sidebar-link ${activeTab === "tickets" ? "active" : ""}`} onClick={() => setActiveTab("tickets")}>
+            <TicketIcon size={18} /> Tickets
+          </button>
+          <button className={`sidebar-link ${activeTab === "orders" ? "active" : ""}`} onClick={() => setActiveTab("orders")}>
+            <ShoppingCart size={18} /> Orders
+          </button>
+          <button className={`sidebar-link ${activeTab === "analytics" ? "active" : ""}`} onClick={() => setActiveTab("analytics")}>
+            <BarChart3 size={18} /> Analytics
+          </button>
+        </nav>
+
+        <div className="sidebar-footer">
+          <button className="sidebar-link logout-link" onClick={logout}>
+            <LogOut size={18} /> Logout
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <div className="table-card">
-        <h3>Recent Support Tickets</h3>
+      {/* ── Main Content ── */}
+      <main className="admin-main">
 
-        {tickets.length === 0 ? (
-          <div className="empty-state">
-            <ShieldAlert size={48} />
-            <p>No tickets found.</p>
-          </div>
-        ) : (
-          <table className="modern-table">
-            <thead>
-              <tr>
-                <th>Ticket ID</th>
-                <th>User Query</th>
-                <th>Order ID</th>
-                <th>Intent</th>
-                <th>Status</th>
-                <th>Confidence</th>
-                <th>Escalation Reason</th>
-                <th>Bot Response</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr key={ticket.ticket_id}>
-                  <td>{ticket.ticket_id}</td>
-                  <td className="user-query-cell">{ticket.text || "—"}</td>
-                  <td>
-                    <span
-                      className="order-id-link"
-                      onClick={() => fetchTicketDetail(ticket.ticket_id)}
-                      title="Click to view order details & policy check"
-                    >
-                      {ticket.order_id || "—"}
-                    </span>
-                  </td>
-                  <td>{ticket.intent.replace("_", " ")}</td>
-                  <td>{getStatusBadge(ticket.status)}</td>
-                  <td>{(ticket.confidence * 100).toFixed(1)}%</td>
-                  <td className="escalation-cell">{ticket.escalation_reason || "—"}</td>
-                  <td className="message-cell">{ticket.message}</td>
-                  <td>
-                    {ticket.status === "PENDING_ADMIN" ? (
-                      <>
-                        <button onClick={() => approveTicket(ticket.ticket_id)}>Approve</button>
-                        <button onClick={() => rejectTicket(ticket.ticket_id)}>Reject</button>
-                      </>
-                    ) : ticket.status === "IN_PROGRESS" ? (
-                      <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>Awaiting Info</span>
-                    ) : (
-                      "Resolved"
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* ─── Dashboard Tab ─── */}
+        {activeTab === "dashboard" && (
+          <>
+            <div className="admin-page-header">
+              <h2>Dashboard</h2>
+            </div>
+
+            {metrics && (
+              <>
+                <div className="metrics-grid">
+                  <div className="metric-card">
+                    <div className="metric-icon" style={{ background: "rgba(37,99,235,0.1)" }}>
+                      <Package size={24} color="#2563EB" />
+                    </div>
+                    <div>
+                      <h3>{metrics.total_orders || 0}</h3>
+                      <p>Total Orders</p>
+                    </div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-icon" style={{ background: "rgba(16,185,129,0.15)" }}>
+                      <Truck size={24} color="#10b981" />
+                    </div>
+                    <div>
+                      <h3>{metrics.active_shipments || 0}</h3>
+                      <p>Active Shipments</p>
+                    </div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-icon" style={{ background: "rgba(245,158,11,0.15)" }}>
+                      <AlertCircle size={24} color="#fbbf24" />
+                    </div>
+                    <div>
+                      <h3>{metrics.pending_escalations}</h3>
+                      <p>Pending Escalations</p>
+                    </div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-icon" style={{ background: "rgba(16,185,129,0.1)" }}>
+                      <TrendingUp size={24} color="#10b981" />
+                    </div>
+                    <div>
+                      <h3>{metrics.average_confidence ? (metrics.average_confidence * 100).toFixed(1) : 0}%</h3>
+                      <p>AI Accuracy</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Charts Row */}
+                <div className="charts-grid">
+                  <div className="table-card" style={{ padding: 0 }}>
+                    <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Activity size={16} /> Query Volume Trend
+                    </h3>
+                    <div style={{ padding: "0 16px 16px" }}>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={weeklyData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                          <XAxis dataKey="name" stroke="var(--text-muted)" />
+                          <YAxis stroke="var(--text-muted)" />
+                          <Tooltip
+                            contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
+                            labelStyle={{ color: "var(--text-primary)" }}
+                            itemStyle={{ color: "var(--text-secondary)" }}
+                          />
+                          <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} dot={{ fill: "#2563EB", r: 4 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div className="table-card" style={{ padding: 0 }}>
+                    <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <BarChart3 size={16} /> Intent Distribution
+                    </h3>
+                    <div style={{ padding: "0 16px 16px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {metrics.intent_distribution && metrics.intent_distribution.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={metrics.intent_distribution}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={110}
+                              paddingAngle={3}
+                              dataKey="value"
+                              nameKey="name"
+                            >
+                              {metrics.intent_distribution.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={INTENT_COLORS[index % INTENT_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
+                            />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <p style={{ color: "var(--text-muted)" }}>No intent data yet</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
         )}
-      </div>
+
+        {/* ─── Tickets Tab ─── */}
+        {activeTab === "tickets" && (
+          <>
+            <div className="admin-page-header">
+              <h2>Support Tickets</h2>
+              <div className="header-stats">
+                <span className="badge badge-success">{tickets.filter(t => t.status === "AUTO_RESOLVED").length} Resolved</span>
+                <span className="badge badge-warning">{tickets.filter(t => t.status === "PENDING_ADMIN").length} Pending</span>
+              </div>
+            </div>
+
+            <div className="table-card">
+              {tickets.length === 0 ? (
+                <div className="empty-state">
+                  <ShieldAlert size={48} />
+                  <p>No tickets found.</p>
+                </div>
+              ) : (
+                <table className="modern-table">
+                  <thead>
+                    <tr>
+                      <th>Ticket ID</th>
+                      <th>User Query</th>
+                      <th>Order ID</th>
+                      <th>Intent</th>
+                      <th>Status</th>
+                      <th>Confidence</th>
+                      <th>Escalation Reason</th>
+                      <th>Bot Response</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tickets.map((ticket) => (
+                      <tr key={ticket.ticket_id}>
+                        <td>{ticket.ticket_id}</td>
+                        <td className="user-query-cell">{ticket.text || "—"}</td>
+                        <td>
+                          <span
+                            className="order-id-link"
+                            onClick={() => fetchTicketDetail(ticket.ticket_id)}
+                            title="Click to view order details & policy check"
+                          >
+                            {ticket.order_id || "—"}
+                          </span>
+                        </td>
+                        <td>{ticket.intent.replace("_", " ")}</td>
+                        <td>{getStatusBadge(ticket.status)}</td>
+                        <td>{(ticket.confidence * 100).toFixed(1)}%</td>
+                        <td className="escalation-cell">{ticket.escalation_reason || "—"}</td>
+                        <td className="message-cell">{ticket.message}</td>
+                        <td>
+                          {ticket.status === "PENDING_ADMIN" ? (
+                            <>
+                              <button onClick={() => approveTicket(ticket.ticket_id)}>Approve</button>
+                              <button onClick={() => rejectTicket(ticket.ticket_id)}>Reject</button>
+                            </>
+                          ) : ticket.status === "IN_PROGRESS" ? (
+                            <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>Awaiting Info</span>
+                          ) : (
+                            "Resolved"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ─── Orders Tab ─── */}
+        {activeTab === "orders" && (
+          <>
+            <div className="admin-page-header">
+              <h2>Orders</h2>
+            </div>
+
+            <div className="order-search-bar">
+              <Search size={18} className="order-search-icon" />
+              <input
+                type="text"
+                placeholder="Search by Order ID, customer or product..."
+                value={orderSearch}
+                onChange={(e) => setOrderSearch(e.target.value)}
+                className="order-search-input"
+              />
+            </div>
+
+            <div className="orders-list">
+              {filteredOrders.length === 0 ? (
+                <div className="empty-state">
+                  <ShoppingCart size={48} />
+                  <p>No orders found.</p>
+                </div>
+              ) : (
+                filteredOrders.map((order) => {
+                  const stepIdx = getStepIndex(order.status);
+                  const isCancelled = order.status === "Cancelled";
+                  return (
+                    <div className={`order-card ${isCancelled ? "order-cancelled" : ""}`} key={order.order_id}>
+                      <div className="order-card-header">
+                        <div className="order-card-title">
+                          <strong>{order.order_id}</strong>
+                          {getOrderStatusBadge(order.status)}
+                        </div>
+                        <div className="order-card-meta">
+                          <span><CreditCard size={14} /> {order.payment_mode || "N/A"}</span>
+                          <span>₹{(order.price || 0).toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      <div className="order-card-info">
+                        <span><Package size={14} /> {order.product_name}</span>
+                        <span><MapPin size={14} /> {order.destination}</span>
+                        {order.customer_name && <span>Customer: {order.customer_name}</span>}
+                      </div>
+
+                      {/* Progress Stepper */}
+                      <div className="order-stepper">
+                        {ORDER_STEPS.map((step, i) => {
+                          const completed = !isCancelled && i <= stepIdx;
+                          const current = !isCancelled && i === stepIdx;
+                          return (
+                            <React.Fragment key={step}>
+                              <div className={`stepper-step ${completed ? "step-completed" : ""} ${current ? "step-current" : ""}`}>
+                                <div className="stepper-circle">
+                                  {completed ? <CheckCircle size={18} /> : <span>{i + 1}</span>}
+                                </div>
+                                <span className="stepper-label">{step}</span>
+                              </div>
+                              {i < ORDER_STEPS.length - 1 && (
+                                <div className={`stepper-line ${!isCancelled && i < stepIdx ? "line-completed" : ""}`} />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+
+                      <div className="order-card-footer">
+                        <span><Calendar size={14} /> Expected: {order.expected_delivery || "N/A"}</span>
+                        {order.delivery_date && <span><CheckCircle size={14} /> Delivered: {order.delivery_date}</span>}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ─── Analytics Tab ─── */}
+        {activeTab === "analytics" && (
+          <>
+            <div className="admin-page-header">
+              <h2>Analytics</h2>
+            </div>
+
+            {metrics && (
+              <div className="metrics-grid">
+                <div className="metric-card">
+                  <div className="metric-icon" style={{ background: "rgba(37,99,235,0.1)" }}>
+                    <Package size={24} color="#2563EB" />
+                  </div>
+                  <div>
+                    <h3>{metrics.total_tickets}</h3>
+                    <p>Total Tickets</p>
+                  </div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-icon" style={{ background: "rgba(16,185,129,0.15)" }}>
+                    <CheckCircle size={24} color="#34d399" />
+                  </div>
+                  <div>
+                    <h3>{metrics.auto_resolved}</h3>
+                    <p>Auto Resolved</p>
+                  </div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-icon" style={{ background: "rgba(245,158,11,0.15)" }}>
+                    <AlertCircle size={24} color="#fbbf24" />
+                  </div>
+                  <div>
+                    <h3>{metrics.pending_escalations}</h3>
+                    <p>Pending Escalations</p>
+                  </div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-icon" style={{ background: "rgba(167,139,250,0.1)" }}>
+                    <TrendingUp size={24} color="#a78bfa" />
+                  </div>
+                  <div>
+                    <h3>{metrics.escalation_rate_percent}%</h3>
+                    <p>Escalation Rate</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="charts-grid">
+              <div className="table-card" style={{ padding: 0 }}>
+                <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <BarChart3 size={16} /> Resolution Overview
+                </h3>
+                <div style={{ padding: "0 16px 16px" }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={weeklyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                      <XAxis dataKey="name" stroke="var(--text-muted)" />
+                      <YAxis stroke="var(--text-muted)" />
+                      <Tooltip
+                        contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
+                        labelStyle={{ color: "var(--text-primary)" }}
+                        itemStyle={{ color: "var(--text-secondary)" }}
+                      />
+                      <Legend />
+                      <Bar dataKey="resolved" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="escalated" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="table-card" style={{ padding: 0 }}>
+                <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Activity size={16} /> Weekly Order Trend
+                </h3>
+                <div style={{ padding: "0 16px 16px" }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={weeklyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                      <XAxis dataKey="name" stroke="var(--text-muted)" />
+                      <YAxis stroke="var(--text-muted)" />
+                      <Tooltip
+                        contentStyle={{ background: "var(--bg-card-solid)", border: "1px solid var(--border-color)", borderRadius: 10 }}
+                        labelStyle={{ color: "var(--text-primary)" }}
+                        itemStyle={{ color: "var(--text-secondary)" }}
+                      />
+                      <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} dot={{ fill: "#2563EB", r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+      </main>
 
       {/* Ticket Detail Modal */}
       {ticketDetail && (
@@ -421,7 +717,7 @@ function Admin() {
                     </div>
                     <div className="detail-field">
                       <span className="detail-label">Price</span>
-                      <span className="detail-value">\u20B9{ticketDetail.order_details.price?.toLocaleString()}</span>
+                      <span className="detail-value">₹{ticketDetail.order_details.price?.toLocaleString()}</span>
                     </div>
                     <div className="detail-field">
                       <span className="detail-label"><CreditCard size={13} /> Payment</span>
