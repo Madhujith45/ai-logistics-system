@@ -289,6 +289,28 @@ def chat(request: ChatRequest):
     }
 
 # -----------------------------------
+# PUBLIC ROUTES
+# -----------------------------------
+
+@app.get("/track/{order_id}")
+def track_order_public(order_id: str):
+    """Public order tracking — no login required."""
+    order = get_order(order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return {
+        "order_id": order["order_id"],
+        "status": order["order_status"],
+        "product_name": order.get("product_name", "N/A"),
+        "customer_name": order.get("customer_name", "N/A"),
+        "origin": order.get("origin"),
+        "destination": order.get("destination"),
+        "expected_delivery": order.get("expected_delivery"),
+        "delivery_date": order.get("delivery_date"),
+    }
+
+
+# -----------------------------------
 # ADMIN ROUTES (PROTECTED)
 # -----------------------------------
 

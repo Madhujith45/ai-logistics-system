@@ -214,7 +214,9 @@ function UserPage() {
 
   // --- New: Session & User Auth State ---
   const [sessionId] = useState(() => generateSessionId());
-  const [userToken, setUserToken] = useState(localStorage.getItem("user_token"));
+  const [userToken, setUserToken] = useState(
+    localStorage.getItem("user_token") || localStorage.getItem("token")
+  );
   const [userProfile, setUserProfile] = useState(null);
   const [showAuthPanel, setShowAuthPanel] = useState(false);
   const [authMode, setAuthMode] = useState("login"); // "login" | "register"
@@ -242,10 +244,17 @@ function UserPage() {
         const data = await res.json();
         setUserProfile(data);
       } else {
-        // Token invalid — clear it
+        // Token invalid — clear user_token only (keep main token intact)
         localStorage.removeItem("user_token");
-        setUserToken(null);
-        setUserProfile(null);
+        // Try main app token as fallback
+        const mainToken = localStorage.getItem("token");
+        if (mainToken && token !== mainToken) {
+          fetchProfile(mainToken);
+          setUserToken(mainToken);
+        } else {
+          setUserToken(null);
+          setUserProfile(null);
+        }
       }
     } catch {
       // silently fail

@@ -1,16 +1,28 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ShieldCheck, AlertCircle, LogIn } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { Box, AlertCircle, LogIn, ArrowLeft, ShieldCheck, User, Sun, Moon } from "lucide-react";
 
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 function Login({ setToken }) {
+  const [searchParams] = useSearchParams();
+  const initialRole = searchParams.get("role") === "admin" ? "admin" : "user";
+
+  const [loginRole, setLoginRole] = useState(initialRole);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((p) => (p === "light" ? "dark" : "light"));
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -40,9 +52,15 @@ function Login({ setToken }) {
       const data = await res.json();
 
       localStorage.setItem("token", data.access_token);
+      localStorage.setItem("role", data.role || "user");
       setToken(data.access_token);
 
-      navigate("/admin");
+      // Redirect based on role
+      if (data.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
 
     } catch (err) {
       console.error(err);
@@ -52,56 +70,88 @@ function Login({ setToken }) {
   };
 
   return (
-    <div className="login-container">
-      <div style={{ textAlign: "center", marginBottom: "8px" }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: 16,
-          background: "linear-gradient(135deg, #1D4ED8, #2563EB)",
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 4px 20px rgba(37, 99, 235, 0.25)",
-          marginBottom: 12
-        }}>
-          <ShieldCheck size={28} color="#FFFFFF" />
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-top-row">
+          <Link to="/" className="login-back-link">
+            <ArrowLeft size={16} /> Back to Home
+          </Link>
+          <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle theme">
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
+        </div>
+
+        <div className="login-logo">
+          <div className="login-logo-icon">
+            <Box size={28} color="#fff" />
+          </div>
+          <h2>Welcome Back</h2>
+          <p>Sign in to access LogiAI</p>
+        </div>
+
+        {/* ── Role Tabs ── */}
+        <div className="login-role-tabs">
+          <button
+            className={`login-role-tab ${loginRole === "user" ? "active" : ""}`}
+            onClick={() => { setLoginRole("user"); setError(""); setUsername(""); setPassword(""); }}
+          >
+            <User size={16} /> User Login
+          </button>
+          <button
+            className={`login-role-tab ${loginRole === "admin" ? "active" : ""}`}
+            onClick={() => { setLoginRole("admin"); setError(""); setUsername(""); setPassword(""); }}
+          >
+            <ShieldCheck size={16} /> Admin Login
+          </button>
+        </div>
+
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="login-field">
+            <label>Username / Email</label>
+            <input
+              type="text"
+              placeholder="Enter your username or email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="login-field">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" className="login-submit-btn" disabled={loading}>
+            <LogIn size={18} /> {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+
+        {error && (
+          <div className="login-error">
+            <AlertCircle size={16} /> {error}
+          </div>
+        )}
+
+        <div className="login-demo-info">
+          <p><strong>Demo Credentials ({loginRole === "admin" ? "Admin" : "User"}):</strong></p>
+          {loginRole === "admin" ? (
+            <p>Username: <code>admin</code> &nbsp;|&nbsp; Password: <code>admin123</code></p>
+          ) : (
+            <>
+              <p><code>rahul@logiai.com</code> / <code>rahul123</code></p>
+              <p><code>priya@logiai.com</code> / <code>priya123</code></p>
+              <p><code>amit@logiai.com</code> / <code>amit123</code></p>
+            </>
+          )}
         </div>
       </div>
-      <h2>Admin Login</h2>
-      <p style={{ textAlign: "center", color: "var(--text-muted)", fontSize: 13, margin: "-16px 0 28px", position: "relative" }}>
-        Secure access to the LogiAI dashboard
-      </p>
-
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button type="submit" disabled={loading} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          <LogIn size={18} /> {loading ? "Signing in..." : "Sign In"}
-        </button>
-      </form>
-
-      {error && (
-        <div style={{
-          display: "flex", alignItems: "center", gap: 8,
-          padding: "10px 14px", marginTop: 16,
-          background: "rgba(239, 68, 68, 0.1)", borderRadius: 10,
-          border: "1px solid rgba(239, 68, 68, 0.2)",
-          color: "#f87171", fontSize: 13
-        }}>
-          <AlertCircle size={16} /> {error}
-        </div>
-      )}
     </div>
   );
 }

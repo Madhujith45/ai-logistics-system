@@ -42,7 +42,8 @@ function Admin() {
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    localStorage.removeItem("role");
+    window.location.href = "/";
   }, []);
 
   const fetchTickets = useCallback(async () => {
