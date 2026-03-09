@@ -47,7 +47,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",                      # Local frontend
-        "https://ai-logistics-system.vercel.app"     # Production frontend
+        "https://ai-logistics-system.vercel.app",    # Original production frontend
+        "https://ai-logistics-system-madhujith45s-projects.vercel.app",  # Current Vercel project URL
+        "https://logiai.vercel.app"                  # Custom domain (if configured)
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import "./App.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 /* ===========================
    SESSION ID GENERATOR

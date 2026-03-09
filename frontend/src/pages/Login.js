@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Box, AlertCircle, LogIn, ArrowLeft, ShieldCheck, User, Sun, Moon } from "lucide-react";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 function Login({ setToken }) {
   const [searchParams] = useSearchParams();

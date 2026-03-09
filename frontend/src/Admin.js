@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import "./App.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 const weeklyData = [
   { name: "Mon", orders: 400, resolved: 240, escalated: 20 },

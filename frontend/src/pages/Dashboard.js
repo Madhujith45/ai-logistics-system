@@ -8,7 +8,7 @@ import {
 import ChatWidget from "../components/ChatWidget";
 import "./Dashboard.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 function Dashboard({ setToken }) {
   const navigate = useNavigate();

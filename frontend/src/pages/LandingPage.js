@@ -7,7 +7,7 @@ import {
   ShieldCheck, User, BrainCircuit, Database, Zap
 } from "lucide-react";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 function LandingPage() {
   const navigate = useNavigate();

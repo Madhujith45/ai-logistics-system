@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import "./ChatWidget.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 /* ── Session ID ── */
 const genSession = () =>
@@ -142,9 +142,14 @@ function ChatWidget({ externalOpen, onClose }) {
       const transcript = e.results[0][0].transcript;
       setInput((prev) => (prev ? prev + " " + transcript : transcript));
       setListening(false);
+      // Keep keyboard flow smooth after voice capture: Enter should send.
+      setTimeout(() => inputRef.current?.focus(), 0);
     };
     recognition.onerror = () => setListening(false);
-    recognition.onend = () => setListening(false);
+    recognition.onend = () => {
+      setListening(false);
+      setTimeout(() => inputRef.current?.focus(), 0);
+    };
     recognitionRef.current = recognition;
     recognition.start();
     setListening(true);
@@ -263,6 +268,12 @@ function ChatWidget({ externalOpen, onClose }) {
             placeholder="Order ID"
             value={orderId}
             onChange={(e) => setOrderId(e.target.value.toUpperCase())}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             maxLength={10}
           />
           <input
