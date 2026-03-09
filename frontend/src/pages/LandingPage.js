@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Truck, Package, Headphones, MapPin, Search,
-  ArrowRight, Shield, Zap, Globe, CheckCircle,
+  ArrowRight, Shield, Globe, CheckCircle,
   Clock, AlertCircle, ChevronRight, Box, Sun, Moon,
-  ShieldCheck, User
+  ShieldCheck, User, BrainCircuit, Database, Zap
 } from "lucide-react";
 
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
@@ -84,38 +84,66 @@ function LandingPage() {
         </div>
       </nav>
 
-      {/* ── Hero Section ── */}
+      {/* ── Hero Section (Two-Column) ── */}
       <section className="landing-hero">
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <div className="hero-badge">
-            <Zap size={14} /> AI-Powered Platform
-          </div>
-          <h1>AI-Powered Logistics<br />Support System</h1>
-          <p>
-            Intelligent order tracking, automated customer support, and real-time
-            shipment visibility — all powered by advanced NLP technology.
-          </p>
-          <div className="hero-buttons">
-            <a href="#track" className="hero-btn-primary">
-              <Search size={18} /> Track Your Order
-            </a>
-            <button className="hero-btn-secondary" onClick={() => navigate("/login?role=user")}>
-              Get Started <ArrowRight size={18} />
-            </button>
-          </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <h3>15K+</h3>
-              <p>Orders Tracked</p>
+        <div className="hero-inner">
+          <div className="hero-left">
+            <div className="hero-badge">
+              <Package size={14} /> Logistics Platform
             </div>
-            <div className="hero-stat">
-              <h3>91.5%</h3>
-              <p>AI Accuracy</p>
+            <h1>Smart Shipment Tracking &amp; Logistics Support Platform</h1>
+            <p>
+              Track shipments, manage delivery requests, and resolve logistics
+              support queries instantly using our AI-assisted logistics platform.
+            </p>
+            <div className="hero-buttons">
+              <a href="#track" className="hero-btn-primary">
+                <Search size={18} /> Track Your Order
+              </a>
+              <button className="hero-btn-secondary" onClick={() => navigate("/login?role=user")}>
+                Get Started <ArrowRight size={18} />
+              </button>
             </div>
-            <div className="hero-stat">
-              <h3>24/7</h3>
-              <p>AI Support</p>
+            <div className="hero-stats">
+              <div className="hero-stat">
+                <Package size={18} className="hero-stat-icon" />
+                <div>
+                  <h3>15K+</h3>
+                  <p>Shipments Processed</p>
+                </div>
+              </div>
+              <div className="hero-stat">
+                <Truck size={18} className="hero-stat-icon" />
+                <div>
+                  <h3>98%</h3>
+                  <p>On-Time Delivery</p>
+                </div>
+              </div>
+              <div className="hero-stat">
+                <Headphones size={18} className="hero-stat-icon" />
+                <div>
+                  <h3>24/7</h3>
+                  <p>Customer Support</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="hero-right">
+            <div className="hero-image-card">
+              <img
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80"
+                alt="Logistics warehouse operations"
+                className="hero-image"
+              />
+              <div className="hero-image-overlay-card">
+                <div className="hero-overlay-stat">
+                  <Truck size={20} />
+                  <div>
+                    <span className="overlay-stat-num">2,400+</span>
+                    <span className="overlay-stat-label">Active Shipments</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -124,13 +152,14 @@ function LandingPage() {
       {/* ── Track Order Section ── */}
       <section className="landing-track" id="track">
         <div className="track-section-inner">
-          <h2>Track Your Shipment</h2>
+          <div className="section-tag"><Package size={14} /> Tracking</div>
+          <h2><Truck size={24} /> Track Your Shipment</h2>
           <p className="track-subtitle">Enter your order details to get real-time tracking updates</p>
 
           <div className="track-card">
             <div className="track-input-row">
               <div className="track-input-wrapper">
-                <Search size={18} className="track-input-icon" />
+                <Package size={18} className="track-input-icon" />
                 <input
                   type="text"
                   placeholder="Enter Order ID (e.g. ORD-1001)"
@@ -228,66 +257,112 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* ── Services Section ── */}
+      {/* ── Logistics Services Section ── */}
       <section className="landing-services" id="services">
         <div className="services-inner">
-          <h2>Our Services</h2>
-          <p className="services-subtitle">Comprehensive logistics solutions powered by AI</p>
+          <div className="services-header">
+            <span className="section-tag"><Package size={14} /> Our Services</span>
+            <h2>Logistics Services</h2>
+            <p className="services-subtitle">End-to-end logistics solutions for modern supply chains</p>
+          </div>
           <div className="services-grid">
             <div className="service-card">
-              <div className="service-icon">
-                <Truck size={28} />
+              <div className="service-card-img">
+                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=600&q=80" alt="Shipment Tracking" />
               </div>
-              <h3>Real-Time Tracking</h3>
-              <p>Track your shipments in real-time with AI-powered status updates and delivery predictions.</p>
+              <div className="service-card-body">
+                <div className="service-icon"><Truck size={24} /></div>
+                <h3>Real-Time Shipment Tracking</h3>
+                <p>Monitor package progress from warehouse to delivery with live status updates and ETA predictions.</p>
+              </div>
             </div>
             <div className="service-card">
-              <div className="service-icon">
-                <Headphones size={28} />
+              <div className="service-card-img">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=600&q=80" alt="Customer Support" />
               </div>
-              <h3>AI Support</h3>
-              <p>Get instant answers to your queries with our NLP-powered chatbot available 24/7.</p>
+              <div className="service-card-body">
+                <div className="service-icon"><Headphones size={24} /></div>
+                <h3>Customer Support Automation</h3>
+                <p>Resolve shipment issues instantly using our AI-powered support assistant available 24/7.</p>
+              </div>
             </div>
             <div className="service-card">
-              <div className="service-icon">
-                <Shield size={28} />
+              <div className="service-card-img">
+                <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=600&q=80" alt="Order Cancellation" />
               </div>
-              <h3>Smart Escalation</h3>
-              <p>Complex issues are automatically escalated to human agents with full context preserved.</p>
-            </div>
-            <div className="service-card">
-              <div className="service-icon">
-                <Globe size={28} />
+              <div className="service-card-body">
+                <div className="service-icon"><Shield size={24} /></div>
+                <h3>Policy-Based Order Cancellation</h3>
+                <p>Process cancellations and refund requests according to verified logistics policies automatically.</p>
               </div>
-              <h3>Pan-India Coverage</h3>
-              <p>Delivering across India with strategically located warehouses and fulfillment centers.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Solutions / How It Works ── */}
+      {/* ── How LogiAI Works (4-Step) ── */}
       <section className="landing-solutions" id="solutions">
         <div className="solutions-inner">
-          <h2>How It Works</h2>
-          <p className="solutions-subtitle">Simple, fast, and intelligent logistics support</p>
+          <div className="section-tag"><Globe size={14} /> Workflow</div>
+          <h2>How LogiAI Works</h2>
+          <p className="solutions-subtitle">From query to resolution in seconds</p>
           <div className="solutions-steps">
             <div className="solution-step">
+              <div className="step-icon-wrap"><Package size={26} /></div>
               <div className="step-number">1</div>
               <h3>Enter Order ID</h3>
-              <p>Type your order ID in the tracking widget to get instant updates.</p>
+              <p>Users enter their order number to track shipments or request logistics support.</p>
             </div>
-            <div className="solution-connector"><ChevronRight size={24} /></div>
+            <div className="solution-connector"><ChevronRight size={22} /></div>
             <div className="solution-step">
+              <div className="step-icon-wrap"><BrainCircuit size={26} /></div>
               <div className="step-number">2</div>
-              <h3>AI Analyzes Query</h3>
-              <p>Our NLP model understands your intent and fetches relevant order data.</p>
+              <h3>AI Detects Request</h3>
+              <p>The NLP engine analyzes the query and identifies intent such as tracking or cancellation.</p>
             </div>
-            <div className="solution-connector"><ChevronRight size={24} /></div>
+            <div className="solution-connector"><ChevronRight size={22} /></div>
             <div className="solution-step">
+              <div className="step-icon-wrap"><Database size={26} /></div>
               <div className="step-number">3</div>
-              <h3>Get Instant Resolution</h3>
-              <p>Receive accurate status updates, cancel orders, or request refunds instantly.</p>
+              <h3>Retrieve Shipment Data</h3>
+              <p>The backend queries the logistics database to fetch shipment status and order information.</p>
+            </div>
+            <div className="solution-connector"><ChevronRight size={22} /></div>
+            <div className="solution-step">
+              <div className="step-icon-wrap"><Truck size={26} /></div>
+              <div className="step-number">4</div>
+              <h3>Real-Time Updates</h3>
+              <p>Shipment progress and delivery ETA are displayed instantly to the user.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Credibility / Trust Metrics ── */}
+      <section className="landing-credibility">
+        <div className="credibility-inner">
+          <h2>Trusted Logistics Support Platform</h2>
+          <p>Reliable, AI-powered logistics support trusted by businesses</p>
+          <div className="credibility-grid">
+            <div className="credibility-card">
+              <div className="credibility-icon"><Package size={22} /></div>
+              <h3>15K+</h3>
+              <p>Shipments Processed</p>
+            </div>
+            <div className="credibility-card">
+              <div className="credibility-icon"><Truck size={22} /></div>
+              <h3>98%</h3>
+              <p>On-Time Delivery</p>
+            </div>
+            <div className="credibility-card">
+              <div className="credibility-icon"><Headphones size={22} /></div>
+              <h3>24/7</h3>
+              <p>Customer Support</p>
+            </div>
+            <div className="credibility-card">
+              <div className="credibility-icon"><Zap size={22} /></div>
+              <h3>AI</h3>
+              <p>Powered Automation</p>
             </div>
           </div>
         </div>
@@ -312,7 +387,7 @@ function LandingPage() {
             <Box size={22} />
             <span>LogiAI</span>
           </div>
-          <p>&copy; 2026 LogiAI. Built for academic purposes.</p>
+          <p>&copy; 2026 LogiAI. All rights reserved.</p>
         </div>
       </footer>
 
