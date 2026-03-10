@@ -138,19 +138,6 @@ function Login({ setToken }) {
             <AlertCircle size={16} /> {error}
           </div>
         )}
-
-        <div className="login-demo-info">
-          <p><strong>Demo Credentials ({loginRole === "admin" ? "Admin" : "User"}):</strong></p>
-          {loginRole === "admin" ? (
-            <p>Username: <code>admin</code> &nbsp;|&nbsp; Password: <code>admin123</code></p>
-          ) : (
-            <>
-              <p><code>rahul@logiai.com</code> / <code>rahul123</code></p>
-              <p><code>priya@logiai.com</code> / <code>priya123</code></p>
-              <p><code>amit@logiai.com</code> / <code>amit123</code></p>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );
