@@ -1,5 +1,7 @@
 # app/main.py
 
+import re
+
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -72,6 +74,34 @@ def on_startup():
 # -----------------------------------
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+def is_greeting_message(text: str) -> bool:
+    """Detect casual greetings in natural user messages.
+
+    Handles phrases like "hey yo how are you" and messages that append
+    metadata such as "(Order: #ORD-1003)".
+    """
+    cleaned = re.sub(r"\(\s*order\s*[:#-]?[^)]*\)", "", text, flags=re.IGNORECASE)
+    cleaned = re.sub(r"[^a-zA-Z\s]", " ", cleaned).lower()
+    normalized = " ".join(cleaned.split())
+
+    if not normalized:
+        return False
+
+    greeting_keywords = {
+        "hi", "hey", "hello", "hii", "hiii", "heyy", "yo", "sup",
+        "good morning", "good afternoon", "good evening", "how are you"
+    }
+    service_keywords = {
+        "track", "status", "cancel", "refund", "return", "damaged",
+        "broken", "wrong", "mismatch", "delivery", "where is", "order"
+    }
+
+    has_greeting = any(kw in normalized for kw in greeting_keywords)
+    has_service_intent = any(kw in normalized for kw in service_keywords)
+
+    return has_greeting and not has_service_intent
 
 # -----------------------------------
 # Health Check
@@ -147,8 +177,7 @@ def chat(request: ChatRequest):
     escalation_reason = None
 
     # Step 1b: Handle greetings — auto-resolve without escalation
-    GREETINGS = {"hi", "hey", "hello", "hii", "hiii", "heyy", "yo", "sup", "good morning", "good afternoon", "good evening"}
-    if request.text.strip().lower() in GREETINGS:
+    if is_greeting_message(request.text):
         message = (
             "👋 Hello! Welcome to LogiAI Support.\n\n"
             "I can help you with:\n"
