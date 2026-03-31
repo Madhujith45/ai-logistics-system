@@ -558,7 +558,14 @@ def apply_policy(intent: str, order: dict, confidence: float = 1.0, return_reaso
         latest_return = _latest_return(order_id)
         latest_refund = get_latest_refund(order_id)
         a_to_z = _a_to_z_eligibility(order, latest_return)
+        
         status_text = order.get("status", "Unknown")
+        return_summary = ""
+        
+        if latest_return:
+            r_status = latest_return.get("status", "pending_verification")
+            status_text = f"Return {r_status.replace('_', ' ').title()}"
+            return_summary = f" (Original order was {order.get('status', 'Delivered')})"
 
         extra_info = {"a_to_z": a_to_z}
         if latest_return:
@@ -573,7 +580,7 @@ def apply_policy(intent: str, order: dict, confidence: float = 1.0, return_reaso
             eligibility=True,
             reason="Tracking status resolved.",
             next_steps=["Monitor updates in dashboard."],
-            message=f"Order {order_id} is currently '{status_text}'.",
+            message=f"Order {order_id} status: {status_text}.{return_summary}",
             refund_options=[],
             pickup=get_pickup_status(order_id),
             extra=extra_info,

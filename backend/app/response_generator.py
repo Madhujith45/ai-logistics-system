@@ -28,6 +28,7 @@ def generate_professional_response(intent: str, policy_result: dict, order: dict
         pickup,
         policy_result.get("return_status"),
         policy_result.get("refund_status"),
+        policy_result.get("verification_status"),
     ]):
         lines = [message]
         if eligibility is not None:
@@ -37,6 +38,10 @@ def generate_professional_response(intent: str, policy_result: dict, order: dict
         if return_status:
             lines.append(f"Return Status: {return_status.replace('_', ' ').title()}")
             
+        verification_status = policy_result.get("verification_status")
+        if verification_status:
+            lines.append(f"Verification Stage: {verification_status.replace('_', ' ').title()}")
+
         refund_status = policy_result.get("refund_status")
         if refund_status:
             lines.append(f"Refund Status: {refund_status.replace('_', ' ').title()}")
