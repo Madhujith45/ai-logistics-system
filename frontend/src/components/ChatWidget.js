@@ -107,10 +107,13 @@ function ChatWidget({ externalOpen, onClose }) {
 
         const data = await res.json();
         
-        // Check if bot is asking for proof (damage/defect case)
-        const needsProof = data.intent === "DAMAGED_PRODUCT" || data.intent === "MISMATCH_PRODUCT" || 
-                           (data.message && data.message.toLowerCase().includes("upload"));
-        setWaitingForProof(needsProof);
+        // Only show upload button if the bot explicitly asks for proof/upload
+        // (usually identified by the video emoji or 'upload' keyword in the success message)
+        const botMsg = (data.message || "").toLowerCase();
+        const isEligible = data.intent === "DAMAGED_PRODUCT" || data.intent === "MISMATCH_PRODUCT";
+        const askedForProof = botMsg.includes("upload") || botMsg.includes("📹");
+        
+        setWaitingForProof(isEligible && askedForProof);
         
         setMessages((prev) => [
           ...prev,
