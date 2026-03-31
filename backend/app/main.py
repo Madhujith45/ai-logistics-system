@@ -214,6 +214,10 @@ def require_admin(token: str = Depends(oauth2_scheme)):
 
 @app.post("/chat")
 def chat(request: ChatRequest):
+    # Auto-fix Order ID if it's missing the prefix (e.g. "1004" -> "ORD-1004")
+    if request.order_id and request.order_id.isdigit():
+        request.order_id = f"ORD-{request.order_id}"
+
     result = classify_intent(request.text)
 
     intent = result["intent"]

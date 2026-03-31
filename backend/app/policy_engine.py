@@ -296,7 +296,7 @@ def request_return(
     if damage_case:
         message = (
             f"I'm sorry to hear that your order arrived damaged! 📹\n\n"
-            f"To process your damage claim, please upload a clear video or photo showing:\n"
+            f"To process your damage claim, please upload a clear video or photo proof showing:\n"
             f"• The damaged packaging\n"
             f"• The damaged product\n\n"
             f"Click the 📹 upload button above to submit your proof. Our team will review it within 24 hours."
@@ -556,8 +556,17 @@ def apply_policy(intent: str, order: dict, confidence: float = 1.0, return_reaso
 
     if intent == "TRACK_ORDER":
         latest_return = _latest_return(order_id)
+        latest_refund = get_latest_refund(order_id)
         a_to_z = _a_to_z_eligibility(order, latest_return)
         status_text = order.get("status", "Unknown")
+
+        extra_info = {"a_to_z": a_to_z}
+        if latest_return:
+            extra_info["return_status"] = latest_return.get("status")
+            extra_info["verification_status"] = latest_return.get("verification_status")
+        if latest_refund:
+            extra_info["refund_status"] = latest_refund.get("status")
+            extra_info["refund_amount"] = latest_refund.get("amount")
 
         return _build_decision(
             decision="Eligible",
@@ -567,7 +576,7 @@ def apply_policy(intent: str, order: dict, confidence: float = 1.0, return_reaso
             message=f"Order {order_id} is currently '{status_text}'.",
             refund_options=[],
             pickup=get_pickup_status(order_id),
-            extra={"a_to_z": a_to_z},
+            extra=extra_info,
         )
 
     if intent == "CANCEL_ORDER":

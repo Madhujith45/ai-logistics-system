@@ -26,10 +26,21 @@ def generate_professional_response(intent: str, policy_result: dict, order: dict
         next_steps,
         refund_options,
         pickup,
+        policy_result.get("return_status"),
+        policy_result.get("refund_status"),
     ]):
         lines = [message]
         if eligibility is not None:
             lines.append(f"Eligibility: {'Eligible' if eligibility else 'Not eligible'}")
+        
+        return_status = policy_result.get("return_status")
+        if return_status:
+            lines.append(f"Return Status: {return_status.replace('_', ' ').title()}")
+            
+        refund_status = policy_result.get("refund_status")
+        if refund_status:
+            lines.append(f"Refund Status: {refund_status.replace('_', ' ').title()}")
+
         if reason:
             lines.append(f"Reason: {reason}")
         if refund_options:
