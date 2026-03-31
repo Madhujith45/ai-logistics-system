@@ -129,17 +129,12 @@ function LandingPage() {
           </div>
           <div className="hero-right">
             <div className="hero-image-card">
-              <img
-                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80"
-                alt="Logistics warehouse operations"
-                className="hero-image"
-              />
               <div className="hero-image-overlay-card">
                 <div className="hero-overlay-stat">
                   <Truck size={20} />
                   <div>
-                    <span className="overlay-stat-num">2,400+</span>
-                    <span className="overlay-stat-label">Active Shipments</span>
+                    <span className="overlay-stat-num">4.8</span>
+                    <span className="overlay-stat-label">Trusted by businesses for dependable global freight support</span>
                   </div>
                 </div>
               </div>

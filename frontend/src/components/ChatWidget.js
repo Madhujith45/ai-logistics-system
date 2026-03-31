@@ -208,11 +208,12 @@ function ChatWidget({ externalOpen, onClose }) {
       const data = await res.json();
 
       if (res.ok) {
+        const fileType = file.type.startsWith("video/") ? "video" : "proof";
         setMessages((prev) => [
           ...prev,
           {
             sender: "bot",
-            text: `✅ Damage proof received!\n\nYour video has been securely stored in our database. Our quality team will review it within 24 hours and confirm your replacement or refund.\n\nWhat would you like to do next?`,
+            text: `✅ Damage ${fileType} received!\n\nYour ${fileType} has been securely stored in our database. Our quality team will review it within 24 hours and confirm your replacement or refund.\n\nWhat would you like to do next?`,
             time: ts(),
           },
         ]);
