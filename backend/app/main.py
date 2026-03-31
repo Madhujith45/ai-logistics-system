@@ -374,6 +374,10 @@ def create_return(req: ReturnRequest):
 
 @app.post("/upload-proof")
 def upload_proof(order_id: str = Form(...), file: UploadFile = File(...)):
+    # Auto-prefix if user provided just the digits
+    if order_id and order_id.isdigit():
+        order_id = f"ORD-{order_id}"
+
     if not order_exists(order_id):
         raise HTTPException(status_code=404, detail="order_id not found")
 
