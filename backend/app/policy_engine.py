@@ -1,298 +1,620 @@
 # app/policy_engine.py
 
+from __future__ import annotations
+
+import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+from app.database import (
+    get_collection,
+    get_policy_by_category,
+    increment_return_count,
+    order_exists,
+    user_exists,
+)
 from app.order_service import cancel_order, get_order
-from app.refund_service import process_refund
-from app.config import STATUS_THRESHOLD, CANCELLATION_THRESHOLD
+from app.pickup_service import create_pickup, get_pickup_status, reschedule_pickup
+from app.refund_service import (
+    create_refund_record,
+    get_latest_refund,
+    get_refund_options,
+    get_refund_timeline,
+    process_refund,
+)
 
+logger = logging.getLogger(__name__)
 
-# -----------------------------------
-# Confidence Thresholds for Auto-Resolution
-# -----------------------------------
-
-INTENT_CONFIDENCE_THRESHOLDS = {
-    "TRACK_ORDER": STATUS_THRESHOLD,
-    "CANCEL_ORDER": CANCELLATION_THRESHOLD,
-    "REFUND_REQUEST": 0.88,
-    "DAMAGED_PRODUCT": 0.85,
-    "MISMATCH_PRODUCT": 0.85,
-    "GENERAL_QUERY": 0.80,
+DAMAGE_KEYWORDS = {
+    "damaged",
+    "broken",
+    "defective",
+    "wrong item",
+    "missing parts",
+    "scratched",
+    "crushed",
+    "leakage",
+    "not as described",
 }
 
-# High-value threshold for extra scrutiny
-HIGH_VALUE_THRESHOLD = 50000  # Orders above this get escalated
+
+def _today() -> datetime:
+    return datetime.utcnow()
 
 
-def handle_cancellation(order_id: str):
-    """Original cancellation handler — preserved for backward compatibility."""
-    result = cancel_order(order_id)
-    return result
+def _parse_date(date_str: str | None) -> datetime | None:
+    if not date_str:
+        return None
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d")
+    except (TypeError, ValueError):
+        return None
 
 
-# -----------------------------------
-# Enhanced Policy Engine
-# -----------------------------------
+def _build_decision(
+    *,
+    decision: str,
+    eligibility: bool,
+    reason: str,
+    next_steps: list[str],
+    message: str,
+    refund_options: list[str] | None = None,
+    pickup: dict[str, Any] | None = None,
+    status: str = "AUTO_RESOLVED",
+    auto_processed: bool = True,
+    extra: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    response: dict[str, Any] = {
+        "decision": decision,
+        "eligibility": eligibility,
+        "reason": reason,
+        "next_steps": next_steps,
+        "refund_options": refund_options or [],
+        "pickup": pickup,
+        "message": message,
+        "status": status,
+        "auto_processed": auto_processed,
+    }
+    if extra:
+        response.update(extra)
+    return response
 
-def apply_policy(intent: str, order: dict, confidence: float = 1.0, return_reason: str = None) -> dict:
-    """
-    Central policy engine that routes to the correct handler
-    based on classified intent. Includes confidence-based automation.
 
-    Returns a structured result dict:
-        - message: str
-        - status: "AUTO_RESOLVED" | "ESCALATED"
-        - auto_processed: bool
-        - escalation_reason: str or None
-    """
+def _is_damage_reason(reason: str | None, intent: str | None = None) -> bool:
+    reason_l = (reason or "").strip().lower()
+    if intent in {"DAMAGED_PRODUCT", "MISMATCH_PRODUCT"}:
+        return True
+    return any(keyword in reason_l for keyword in DAMAGE_KEYWORDS)
 
-    product_name = order.get("product_name", "your item")
-    order_status = order.get("order_status", order.get("status", "Unknown"))
-    order_id = order.get("order_id", "N/A")
-    price = order.get("price", 0)
 
-    # Step 1: Check confidence threshold for the intent
-    threshold = INTENT_CONFIDENCE_THRESHOLDS.get(intent, STATUS_THRESHOLD)
-    low_confidence = confidence < threshold
+def _compute_return_eligibility(order: dict, policy: dict) -> tuple[bool, str]:
+    delivery_date = _parse_date(order.get("delivery_date"))
+    return_days = int(policy.get("return_days", order.get("return_window_days", 7)))
 
-    # Step 2: Check if high-value order needs extra scrutiny
-    is_high_value = price and price > HIGH_VALUE_THRESHOLD
+    if not delivery_date:
+        return False, "Order is not delivered yet. Return can start only after delivery confirmation."
 
-    # ---- TRACK ORDER ----
-    if intent == "TRACK_ORDER":
-        result = _handle_tracking(order)
-        # Tracking is always auto-resolved regardless of confidence
-        return result
+    if delivery_date.date() > _today().date():
+        return False, "Delivery date is in the future. Return request is not allowed yet."
 
-    # ---- CANCEL ORDER ----
-    if intent == "CANCEL_ORDER":
-        result = _handle_cancellation_policy(order)
-        # If low confidence on cancellation, escalate instead
-        if low_confidence and result.get("auto_processed"):
-            result["status"] = "ESCALATED"
-            result["auto_processed"] = False
-            result["escalation_reason"] = f"Low confidence ({round(confidence * 100, 1)}%) for cancellation request"
-            result["message"] = (
-                f"We've received your cancellation request for order #{order_id}. "
-                f"Your request requires additional review by our support team. "
-                f"A specialist will process this within 24 hours."
-            )
-        return result
+    deadline = delivery_date + timedelta(days=return_days)
 
-    # ---- REFUND REQUEST ----
-    if intent == "REFUND_REQUEST":
-        result = _handle_refund(order)
-        # Escalate high-value refunds or low confidence
-        if is_high_value and result.get("auto_processed"):
-            result["status"] = "ESCALATED"
-            result["auto_processed"] = False
-            result["escalation_reason"] = f"High-value refund (₹{price:,.0f}) requires admin approval"
-            result["message"] += (
-                f"\n\nNote: Due to the order value (₹{price:,.0f}), your refund request "
-                f"has been forwarded to our senior support team for expedited processing."
-            )
-        elif low_confidence:
-            result["status"] = "ESCALATED"
-            result["auto_processed"] = False
-            result["escalation_reason"] = f"Low confidence ({round(confidence * 100, 1)}%) for refund request"
-        return result
+    if _today() <= deadline:
+        if delivery_date.date() == _today().date():
+            return True, "Eligible for same-day return initiation within policy window."
+        return True, f"Eligible. Return window is open until {deadline.strftime('%Y-%m-%d')}."
 
-    # ---- DAMAGED PRODUCT ----
-    if intent == "DAMAGED_PRODUCT":
-        return _handle_damage(order, return_reason=return_reason)
+    return False, f"Not eligible. Return window expired on {deadline.strftime('%Y-%m-%d')}."
 
-    # ---- MISMATCH PRODUCT ----
-    if intent == "MISMATCH_PRODUCT":
-        return _handle_mismatch(order, return_reason=return_reason)
 
-    # ---- GENERAL QUERY / FALLBACK ----
+def _latest_return(order_id: str) -> dict[str, Any] | None:
+    return get_collection("returns").find_one({"order_id": order_id}, sort=[("created_at", -1)])
+
+
+def _a_to_z_eligibility(order: dict, return_doc: dict[str, Any] | None = None) -> dict[str, Any]:
+    expected_delivery = _parse_date(order.get("expected_delivery"))
+    delivered = str(order.get("raw_status", order.get("status", ""))).lower() == "delivered"
+
+    reasons: list[str] = []
+
+    if expected_delivery and not delivered and _today() > expected_delivery + timedelta(days=3):
+        reasons.append("Order not delivered after expected date + 3 days")
+
+    latest_refund = get_latest_refund(order.get("order_id"))
+    if latest_refund and latest_refund.get("status") != "completed":
+        refund_updated_at = latest_refund.get("updated_at") or latest_refund.get("created_at") or _today()
+        if _today() > refund_updated_at + timedelta(days=7):
+            reasons.append("Refund not received within expected timeline")
+
+    if return_doc:
+        seller_contacted_at = return_doc.get("seller_contacted_at")
+        seller_responded_at = return_doc.get("seller_responded_at")
+        if seller_contacted_at and not seller_responded_at:
+            start = seller_contacted_at if isinstance(seller_contacted_at, datetime) else _today()
+            if _today() > start + timedelta(hours=48):
+                reasons.append("Seller did not respond within 48 hours")
+
+    if not reasons:
+        return {
+            "eligible": False,
+            "reason": "A-to-Z guarantee conditions are not met.",
+            "claim_status": None,
+            "resolution_eta": None,
+        }
+
+    claims = get_collection("claims")
+    existing = claims.find_one({"order_id": order.get("order_id")}, sort=[("created_at", -1)])
+    if existing:
+        claim_status = existing.get("status", "pending")
+    else:
+        claim = {
+            "order_id": order.get("order_id"),
+            "user_id": order.get("user_id"),
+            "status": "pending",
+            "reasons": reasons,
+            "created_at": _today(),
+            "updated_at": _today(),
+            "appeal_until": (_today() + timedelta(days=30)).strftime("%Y-%m-%d"),
+        }
+        claims.insert_one(claim)
+        claim_status = "pending"
+
     return {
-        "message": (
-            "Thank you for reaching out to LogiAI Support. "
-            "We were unable to automatically process your request. "
-            "Your query has been escalated to a support specialist. "
-            "Our team will respond within 24 hours."
-        ),
-        "status": "ESCALATED",
-        "auto_processed": False,
-        "escalation_reason": "General query or unrecognized intent",
+        "eligible": True,
+        "reason": "; ".join(reasons),
+        "claim_status": claim_status,
+        "resolution_eta": "up to 7 days",
     }
 
 
-def _handle_tracking(order: dict) -> dict:
-    product_name = order.get("product_name", "your item")
-    order_status = order.get("order_status", order.get("status", "Unknown"))
-    order_id = order.get("order_id", "N/A")
-    delivery_date = order.get("delivery_date")
+def _validate_order_user(order_id: str, user_id: int | None = None) -> tuple[dict | None, str | None]:
+    if not order_exists(order_id):
+        return None, "Order not found"
 
-    status_messages = {
-        "Placed": (
-            f"📤 Order Dispatched!\n\n"
-            f"Your order #{order_id} for {product_name} has been placed and is being prepared for dispatch.\n"
-            f"📦 We'll notify you once it ships."
-        ),
-        "Processing": (
-            f"🛠 Order Processing\n\n"
-            f"Your order #{order_id} for {product_name} is currently being processed.\n"
-            f"⏳ Expected dispatch within 1–2 business days."
-        ),
-        "Shipped": (
-            f"🚛 In Transit\n\n"
-            f"Your order #{order_id} for {product_name} has been shipped and is on its way!\n"
-            f"📧 You will receive tracking details via email shortly."
-        ),
-        "Out for Delivery": (
-            f"🚚 Out for Delivery!\n\n"
-            f"Great news! Your order #{order_id} for {product_name} is out for delivery.\n"
-            f"📍 It will arrive today — please ensure someone is available to receive it."
-        ),
-        "Delivered": (
-            f"📦 Delivered Successfully!\n\n"
-            f"Your order #{order_id} for {product_name} was delivered on {delivery_date or 'a recent date'}.\n"
-            f"✅ We hope you enjoy your purchase! If you have any concerns, feel free to reach out."
-        ),
-        "Cancelled": (
-            f"❌ Order Cancelled\n\n"
-            f"Your order #{order_id} for {product_name} has been cancelled.\n"
-            f"💳 If a payment was made, a refund will be initiated within 5–7 business days.\n"
-            f"If you did not request this, please contact our support team immediately."
-        ),
-    }
+    order = get_order(order_id)
+    if not order:
+        return None, "Order not found"
 
-    message = status_messages.get(
-        order_status,
-        f"Your order #{order_id} for {product_name} is currently in '{order_status}' status. Please check back later for updates."
+    effective_user_id = user_id if user_id is not None else order.get("user_id")
+    if effective_user_id is not None and not user_exists(effective_user_id):
+        return None, "User not found"
+
+    if user_id is not None and order.get("user_id") not in (None, user_id):
+        return None, "Order does not belong to provided user"
+
+    return order, None
+
+
+def check_return_eligibility(order_id: str) -> dict:
+    order, error = _validate_order_user(order_id)
+    if error:
+        return _build_decision(
+            decision="Not Eligible",
+            eligibility=False,
+            reason=error,
+            next_steps=["Verify order_id and retry."],
+            message=error,
+            status="ESCALATED",
+            auto_processed=False,
+        )
+
+    policy = get_policy_by_category(order.get("category"))
+    eligible, reason = _compute_return_eligibility(order, policy)
+
+    return _build_decision(
+        decision="Eligible" if eligible else "Not Eligible",
+        eligibility=eligible,
+        reason=reason,
+        next_steps=[
+            "Proceed with /request-return if eligible.",
+            "Contact support if you need policy exception review.",
+        ],
+        message=reason,
+        extra={
+            "order_id": order_id,
+            "category": policy.get("category", "default"),
+            "return_days": int(policy.get("return_days", 7)),
+        },
     )
 
-    return {
-        "message": message,
-        "status": "AUTO_RESOLVED",
-        "auto_processed": True,
-        "escalation_reason": None,
+
+def request_return(
+    order_id: str,
+    reason: str,
+    user_id: int | None = None,
+    refund_type: str | None = None,
+    partial_items: list[str] | None = None,
+) -> dict:
+    order, error = _validate_order_user(order_id, user_id)
+    if error:
+        return _build_decision(
+            decision="Rejected",
+            eligibility=False,
+            reason=error,
+            next_steps=["Provide valid order_id and user_id."],
+            message=error,
+            status="ESCALATED",
+            auto_processed=False,
+            extra={"success": False, "order_id": order_id},
+        )
+
+    policy = get_policy_by_category(order.get("category"))
+    damage_case = _is_damage_reason(reason)
+    non_returnable = bool(policy.get("non_returnable", False))
+
+    if non_returnable and not damage_case:
+        msg = "This category is non-returnable unless item is damaged/defective/incorrect."
+        return _build_decision(
+            decision="Not Eligible",
+            eligibility=False,
+            reason=msg,
+            next_steps=["Raise damage/defect claim with proof if applicable."],
+            message=msg,
+            status="ESCALATED",
+            auto_processed=False,
+            extra={"success": False, "order_id": order_id},
+        )
+
+    eligible, eligibility_reason = _compute_return_eligibility(order, policy)
+    if not eligible:
+        return _build_decision(
+            decision="Not Eligible",
+            eligibility=False,
+            reason=eligibility_reason,
+            next_steps=["Contact support for exception handling."],
+            message=eligibility_reason,
+            status="ESCALATED",
+            auto_processed=False,
+            extra={"success": False, "order_id": order_id},
+        )
+
+    returns = get_collection("returns")
+    effective_user = user_id if user_id is not None else order.get("user_id")
+
+    verification_status = "pending" if damage_case else "verified"
+    return_status = "pending_verification" if damage_case else "approved"
+
+    return_doc = {
+        "order_id": order_id,
+        "user_id": effective_user,
+        "reason": reason,
+        "status": return_status,
+        "verification_status": verification_status,
+        "partial_items": partial_items or [],
+        "request_date": _today().strftime("%Y-%m-%d"),
+        "created_at": _today(),
+        "updated_at": _today(),
+        "seller_contacted_at": _today(),
+        "seller_responded_at": None,
     }
+    returns.insert_one(return_doc)
 
+    abuse = increment_return_count(effective_user)
+    pickup = None
+    refund_details = None
 
-def _handle_cancellation_policy(order: dict) -> dict:
-    product_name = order.get("product_name", "your item")
-    order_status = order.get("order_status", order.get("status", "Unknown"))
-    order_id = order.get("order_id", "N/A")
+    if damage_case:
+        message = (
+            f"I'm sorry to hear that your order arrived damaged! 📹\n\n"
+            f"To process your damage claim, please upload a clear video or photo showing:\n"
+            f"• The damaged packaging\n"
+            f"• The damaged product\n\n"
+            f"Click the 📹 upload button above to submit your proof. Our team will review it within 24 hours."
+        )
+        next_steps = [
+            "Click the 📹 upload button to submit damage proof video/photo",
+            "Our team reviews and confirms within 24 hours",
+            "Replacement or refund is processed immediately",
+        ]
+        decision = "Pending Verification"
+        final_status = "ESCALATED"
+        auto_processed = False
+    else:
+        pickup = create_pickup(order_id)
 
-    # Cancellable statuses
-    if order_status.upper() in ["PROCESSING", "PLACED"]:
-        cancel_result = cancel_order(order_id)
-        if cancel_result["success"]:
-            return {
-                "message": (
-                    f"Your order #{order_id} for {product_name} has been successfully cancelled. "
-                    f"Any payment made will be refunded within 5-7 business days."
-                ),
-                "status": "AUTO_RESOLVED",
-                "auto_processed": True,
-                "escalation_reason": None,
-            }
+        if bool(policy.get("replacement_allowed", True)) and bool(order.get("item_available", True)):
+            message = "Replacement approved and pickup scheduled."
+            decision = "Eligible"
+            next_steps = [
+                "Keep item ready in original condition.",
+                "Pickup partner will collect the parcel.",
+                "Replacement shipment will be triggered after pickup scan.",
+            ]
         else:
-            return {
-                "message": cancel_result["message"],
-                "status": "ESCALATED",
-                "auto_processed": False,
-                "escalation_reason": "Cancellation failed: " + cancel_result["message"],
+            options = get_refund_options(order.get("payment_mode", "prepaid"))
+            selected = (refund_type or options[0]).lower()
+            if selected not in options:
+                selected = options[0]
+            refund_doc = create_refund_record(
+                order_id=order_id,
+                amount=float(order.get("price", 0) or 0),
+                refund_type=selected,
+                user_id=effective_user,
+                metadata={"source": "return_request"},
+            )
+            refund_details = {
+                "status": refund_doc.get("status"),
+                "refund_type": selected,
+                "timeline": refund_doc.get("timeline"),
             }
+            message = "Return approved. Refund initiated based on selected refund type."
+            decision = "Eligible"
+            next_steps = [
+                "Keep item ready for reverse pickup.",
+                "Track refund status from initiated -> processing -> completed.",
+            ]
 
-    # Non-cancellable statuses
-    if order_status.upper() in ["SHIPPED", "OUT FOR DELIVERY", "OUT_FOR_DELIVERY"]:
+        final_status = "AUTO_RESOLVED"
+        auto_processed = True
+
+    logger.info(
+        "return_requested order_id=%s user_id=%s damage_case=%s eligible=%s",
+        order_id,
+        effective_user,
+        damage_case,
+        eligible,
+    )
+
+    return _build_decision(
+        decision=decision,
+        eligibility=True,
+        reason=eligibility_reason,
+        next_steps=next_steps,
+        refund_options=get_refund_options(order.get("payment_mode", "prepaid")),
+        pickup=pickup,
+        message=message,
+        status=final_status,
+        auto_processed=auto_processed,
+        extra={
+            "success": True,
+            "order_id": order_id,
+            "return_status": return_status,
+            "verification_status": verification_status,
+            "video_required": damage_case,
+            "refund": refund_details,
+            "abuse_detection": abuse,
+        },
+    )
+
+
+def register_video_upload(order_id: str, video_url: str) -> dict:
+    order, error = _validate_order_user(order_id)
+    if error:
+        return _build_decision(
+            decision="Rejected",
+            eligibility=False,
+            reason=error,
+            next_steps=["Provide valid order_id."],
+            message=error,
+            status="ESCALATED",
+            auto_processed=False,
+            extra={"success": False, "order_id": order_id},
+        )
+
+    returns = get_collection("returns")
+    latest_return = _latest_return(order_id)
+
+    if not latest_return:
+        return _build_decision(
+            decision="Rejected",
+            eligibility=False,
+            reason="No return request found for this order.",
+            next_steps=["Create return request first using /request-return."],
+            message="No return request found for this order.",
+            status="ESCALATED",
+            auto_processed=False,
+            extra={"success": False, "order_id": order_id},
+        )
+
+    # Note: Binary video data is already stored by store_upload_with_binary() in main.py
+    # We just need to update the returns collection with the upload reference
+    returns.update_one(
+        {"_id": latest_return["_id"]},
+        {
+            "$set": {
+                "video_url": video_url,
+                "video_uploaded": True,
+                "verification_status": "pending",
+                "status": "pending_verification",
+                "updated_at": _today(),
+            }
+        },
+    )
+
+    return _build_decision(
+        decision="Pending Verification",
+        eligibility=True,
+        reason="Damage proof uploaded. Verification is pending.",
+        next_steps=[
+            "Wait for quality verification.",
+            "Refund remains blocked until verification is completed.",
+        ],
+        message="Proof uploaded successfully.",
+        status="ESCALATED",
+        auto_processed=False,
+        extra={
+            "success": True,
+            "order_id": order_id,
+            "verification_status": "pending",
+            "video_url": video_url,
+        },
+    )
+
+
+def update_damage_verification(order_id: str, verification_status: str, reviewer_note: str | None = None) -> dict:
+    returns = get_collection("returns")
+    latest_return = _latest_return(order_id)
+    if not latest_return:
+        return {"success": False, "message": "No return request found."}
+
+    status = verification_status.lower().strip()
+    if status not in {"verified", "rejected", "pending"}:
+        return {"success": False, "message": "Invalid verification status."}
+
+    new_return_status = latest_return.get("status", "pending_verification")
+    if status == "verified":
+        new_return_status = "approved"
+    elif status == "rejected":
+        new_return_status = "rejected"
+
+    returns.update_one(
+        {"_id": latest_return["_id"]},
+        {
+            "$set": {
+                "verification_status": status,
+                "status": new_return_status,
+                "reviewer_note": reviewer_note,
+                "updated_at": _today(),
+            }
+        },
+    )
+
+    if status == "verified":
+        create_pickup(order_id)
+
+    return {
+        "success": True,
+        "order_id": order_id,
+        "verification_status": status,
+        "return_status": new_return_status,
+    }
+
+
+def get_refund_options_for_order(order_id: str) -> dict:
+    order, error = _validate_order_user(order_id)
+    if error:
         return {
-            "message": (
-                f"We're sorry, but your order #{order_id} for {product_name} is already "
-                f"'{order_status}' and cannot be cancelled at this stage. "
-                f"You may initiate a return after delivery if needed."
-            ),
-            "status": "ESCALATED",
-            "auto_processed": False,
-            "escalation_reason": f"Order already {order_status} — cancellation denied",
+            "success": False,
+            "order_id": order_id,
+            "reason": error,
+            "refund_options": [],
+            "timelines": {},
         }
 
-    if order_status.upper() == "DELIVERED":
+    latest_return = _latest_return(order_id)
+    verification_status = latest_return.get("verification_status") if latest_return else None
+
+    options = get_refund_options(order.get("payment_mode", "prepaid"))
+    blocked = verification_status in {"pending", "rejected"}
+
+    return {
+        "success": True,
+        "order_id": order_id,
+        "payment_mode": order.get("payment_mode"),
+        "refund_options": options,
+        "timelines": {opt: get_refund_timeline(opt) for opt in options},
+        "blocked": blocked,
+        "block_reason": (
+            "Damage verification pending/rejected. Refund is blocked."
+            if blocked
+            else None
+        ),
+    }
+
+
+def schedule_pickup(order_id: str, reschedule_date: str | None = None) -> dict:
+    if reschedule_date:
+        result = reschedule_pickup(order_id, reschedule_date)
+    else:
+        result = create_pickup(order_id)
+
+    if not result.get("success"):
         return {
-            "message": (
-                f"Your order #{order_id} for {product_name} has already been delivered. "
-                f"Cancellation is no longer available. Please initiate a return or refund request instead."
-            ),
-            "status": "ESCALATED",
-            "auto_processed": False,
-            "escalation_reason": "Order already delivered — cancellation not possible",
+            "success": False,
+            "reason": result.get("message", "Unable to schedule pickup."),
+            "pickup": get_pickup_status(order_id),
         }
 
     return {
-        "message": (
-            f"We are unable to process the cancellation for order #{order_id} at this time. "
-            f"Your request has been escalated to our support team."
-        ),
-        "status": "ESCALATED",
-        "auto_processed": False,
-        "escalation_reason": f"Unknown order status: {order_status}",
+        "success": True,
+        "message": result.get("message", "Pickup scheduled."),
+        "pickup": get_pickup_status(order_id),
     }
 
 
-def _handle_refund(order: dict) -> dict:
-    refund_result = process_refund(order)
-    status = "AUTO_RESOLVED" if refund_result["eligible"] else "ESCALATED"
-    escalation_reason = None if refund_result["eligible"] else "Refund not eligible based on policy"
-    return {
-        "message": refund_result["message"],
-        "status": status,
-        "auto_processed": refund_result["eligible"],
-        "refund_details": refund_result,
-        "escalation_reason": escalation_reason,
-    }
+def handle_cancellation(
+    order_id: str,
+    user_id: int | None = None,
+    partial_items: list[str] | None = None,
+    combined_shipment: bool = False,
+    cancellation_reason: str | None = None,
+):
+    return cancel_order(
+        order_id=order_id,
+        user_id=user_id,
+        partial_items=partial_items,
+        combined_shipment=combined_shipment,
+        cancellation_reason=cancellation_reason,
+    )
 
 
-def _handle_damage(order: dict, return_reason: str = None) -> dict:
-    product_name = order.get("product_name", "your item")
-    order_id = order.get("order_id", "N/A")
+def apply_policy(intent: str, order: dict, confidence: float = 1.0, return_reason: str | None = None) -> dict:
+    order_id = order.get("order_id")
+    reason_text = return_reason or ""
 
-    # Build reason-specific messaging
-    reason_detail = ""
-    if return_reason:
-        reason_map = {
-            "damaged_packaging": "damaged packaging",
-            "product_defective": "a defective product",
-            "product_broken": "a broken product",
-        }
-        reason_detail = f" regarding {reason_map.get(return_reason, return_reason)}"
+    logger.info("policy_eval intent=%s order_id=%s confidence=%.4f", intent, order_id, confidence)
 
-    return {
-        "message": (
-            f"We are truly sorry to hear that your {product_name} (Order #{order_id}) arrived damaged{reason_detail}. "
-            f"A replacement request has been initiated for your order. "
-            f"Please upload images of the damaged product via the support portal within 48 hours "
-            f"to help us expedite the process. Our team will review and confirm the replacement within 24 hours."
-        ),
-        "status": "ESCALATED",
-        "auto_processed": False,
-        "escalation_reason": f"Damaged product report{reason_detail}",
-    }
+    if intent == "TRACK_ORDER":
+        latest_return = _latest_return(order_id)
+        a_to_z = _a_to_z_eligibility(order, latest_return)
+        status_text = order.get("status", "Unknown")
 
+        return _build_decision(
+            decision="Eligible",
+            eligibility=True,
+            reason="Tracking status resolved.",
+            next_steps=["Monitor updates in dashboard."],
+            message=f"Order {order_id} is currently '{status_text}'.",
+            refund_options=[],
+            pickup=get_pickup_status(order_id),
+            extra={"a_to_z": a_to_z},
+        )
 
-def _handle_mismatch(order: dict, return_reason: str = None) -> dict:
-    product_name = order.get("product_name", "your item")
-    order_id = order.get("order_id", "N/A")
+    if intent == "CANCEL_ORDER":
+        result = handle_cancellation(order_id=order_id, user_id=order.get("user_id"))
+        return _build_decision(
+            decision=result.get("decision", "Processed"),
+            eligibility=bool(result.get("success", False)),
+            reason=result.get("message", "Cancellation processed."),
+            next_steps=[result.get("next_steps", "")],
+            message=result.get("message", "Cancellation processed."),
+            status="AUTO_RESOLVED" if result.get("success") else "ESCALATED",
+            auto_processed=bool(result.get("success")),
+        )
 
-    reason_detail = ""
-    if return_reason:
-        reason_map = {
-            "wrong_item": "a completely wrong item",
-            "wrong_color": "the wrong color",
-            "wrong_size": "the wrong size",
-        }
-        reason_detail = f" — specifically, {reason_map.get(return_reason, return_reason)}"
+    if intent == "REFUND_REQUEST":
+        latest_return = _latest_return(order_id)
+        verification_status = latest_return.get("verification_status") if latest_return else None
+        refund_eval = process_refund(order, verification_status=verification_status)
 
-    return {
-        "message": (
-            f"We apologize for the inconvenience. It appears you received a different item "
-            f"instead of {product_name} (Order #{order_id}){reason_detail}. "
-            f"A replacement process has been initiated. Please upload images of the received item "
-            f"via the support portal within 48 hours. "
-            f"Once verified, we will ship the correct product to you at no additional cost."
-        ),
-        "status": "ESCALATED",
-        "auto_processed": False,
-        "escalation_reason": f"Product mismatch report{reason_detail}",
-    }
+        return _build_decision(
+            decision=refund_eval.get("decision", "Processed"),
+            eligibility=bool(refund_eval.get("eligible", False)),
+            reason="Refund policy evaluated.",
+            next_steps=[
+                "Use /refund-options to choose payout mode.",
+                "If return is required, create /request-return.",
+            ],
+            message=refund_eval.get("message", "Refund evaluated."),
+            refund_options=refund_eval.get("refund_options", []),
+            status="AUTO_RESOLVED" if refund_eval.get("eligible") else "ESCALATED",
+            auto_processed=bool(refund_eval.get("eligible")),
+        )
+
+    if intent in {"DAMAGED_PRODUCT", "MISMATCH_PRODUCT"}:
+        outcome = request_return(
+            order_id=order_id,
+            reason=reason_text or "damaged item",
+            user_id=order.get("user_id"),
+        )
+        return outcome
+
+    return _build_decision(
+        decision="Escalated",
+        eligibility=False,
+        reason="Intent requires manual support handling.",
+        next_steps=["Support specialist will respond within 24 hours."],
+        message="Query escalated to support specialist.",
+        status="ESCALATED",
+        auto_processed=False,
+    )

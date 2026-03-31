@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Box, AlertCircle, LogIn, ArrowLeft, ShieldCheck, User, Sun, Moon } from "lucide-react";
-
-const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
+import { BASE_URL } from "../apiBase";
 
 function Login({ setToken }) {
   const [searchParams] = useSearchParams();
@@ -44,7 +43,21 @@ function Login({ setToken }) {
       });
 
       if (!res.ok) {
-        setError("Invalid username or password");
+        let serverMessage = "Invalid username or password";
+        try {
+          const errBody = await res.json();
+          if (typeof errBody?.detail === "string" && errBody.detail.trim()) {
+            serverMessage = errBody.detail;
+          }
+        } catch {
+          // Keep default message if response body is not JSON.
+        }
+
+        if (res.status >= 500) {
+          setError(serverMessage || "Authentication service unavailable. Please try again.");
+        } else {
+          setError(serverMessage);
+        }
         setLoading(false);
         return;
       }

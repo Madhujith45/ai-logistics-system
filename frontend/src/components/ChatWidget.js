@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   MessageSquare, X, Send, Mic, MicOff, Bot, User,
-  Package, Truck, Minimize2
+  Package, Truck, Minimize2, Upload
 } from "lucide-react";
 import "./ChatWidget.css";
-
-const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
+import { BASE_URL } from "../apiBase";
 
 /* ── Session ID ── */
 const genSession = () =>
@@ -28,7 +27,7 @@ function ChatWidget({ externalOpen, onClose }) {
     {
       sender: "bot",
       text:
-        "👋 Hello! I'm the LogiAI Support Assistant.\n\nI can help you with:\n• 📦 Track your order\n• ❌ Cancel an order\n• 💳 Request a refund\n• 📝 Report issues\n\nType your message or tap a quick action below!",
+        "👋 Hello! I'm the LogiAI Support Assistant.\n\nI can help you with:\n• 📦 Track your order\n• ❌ Cancel an order\n• 💳 Request a refund\n• 📝 Report damage or issues\n\nType your message or tap a quick action below!",
       time: ts(),
     },
   ]);
@@ -36,11 +35,14 @@ function ChatWidget({ externalOpen, onClose }) {
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [waitingForProof, setWaitingForProof] = useState(false);  // Show upload only when damage claimed
   const [pulse, setPulse] = useState(true); // attention pulse on bubble
   const [sessionId] = useState(genSession);
 
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
 
   /* sync with external open prop (from Dashboard sidebar) */
@@ -104,6 +106,12 @@ function ChatWidget({ externalOpen, onClose }) {
         });
 
         const data = await res.json();
+        
+        // Check if bot is asking for proof (damage/defect case)
+        const needsProof = data.intent === "DAMAGED_PRODUCT" || data.intent === "MISMATCH_PRODUCT" || 
+                           (data.message && data.message.toLowerCase().includes("upload"));
+        setWaitingForProof(needsProof);
+        
         setMessages((prev) => [
           ...prev,
           { sender: "bot", text: data.message, intent: data.intent, time: ts() },
@@ -120,7 +128,7 @@ function ChatWidget({ externalOpen, onClose }) {
       }
       setLoading(false);
     },
-    [input, loading, sessionId]
+    [input, loading, orderId, sessionId]
   );
 
   /* ── Voice input ── */
@@ -154,6 +162,84 @@ function ChatWidget({ externalOpen, onClose }) {
     recognition.start();
     setListening(true);
   }, [listening]);
+
+  /* ── File Upload for Damage Proof ── */
+  const handleFileSelect = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || uploading) return;
+
+    const finalOrderId = orderId.trim();
+    if (!finalOrderId) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "❌ Please enter your Order ID in the field above to upload proof.",
+          time: ts(),
+        },
+      ]);
+      return;
+    }
+
+    setUploading(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: `📹 Uploading damage proof: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`, time: ts() },
+    ]);
+
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("order_id", finalOrderId);
+      formData.append("file", file);
+
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(`${BASE_URL}/upload-proof`, {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: `✅ Damage proof received!\n\nYour video has been securely stored in our database. Our quality team will review it within 24 hours and confirm your replacement or refund.\n\nWhat would you like to do next?`,
+            time: ts(),
+          },
+        ]);
+        setWaitingForProof(false);  // Proof uploaded, done waiting
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: `❌ Upload failed: ${data.detail || "Please try again with a valid file"}`,
+            time: ts(),
+          },
+        ]);
+      }
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "❌ Connection error. Please check your internet and try again.",
+          time: ts(),
+        },
+      ]);
+    }
+
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, [orderId, uploading]);
+
+  const openFileDialog = () => fileInputRef.current?.click();
 
   /* ── Quick actions ── */
   const quickActions = [
@@ -262,6 +348,29 @@ function ChatWidget({ externalOpen, onClose }) {
           >
             {listening ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
+          
+          {/* Only show upload button when waiting for damage proof */}
+          {waitingForProof && (
+            <>
+              <button
+                className={`cw-upload-btn ${uploading ? "cw-upload-active" : ""}`}
+                onClick={openFileDialog}
+                disabled={uploading || loading}
+                title="Upload damage proof video"
+              >
+                <Upload size={18} />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*,image/*"
+                onChange={handleFileSelect}
+                style={{ display: "none" }}
+                disabled={uploading}
+              />
+            </>
+          )}
+          
           <input
             type="text"
             className="cw-order-input"

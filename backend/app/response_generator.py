@@ -14,6 +14,36 @@ def generate_professional_response(intent: str, policy_result: dict, order: dict
     """
     message = policy_result.get("message", "")
 
+    eligibility = policy_result.get("eligibility")
+    reason = policy_result.get("reason")
+    next_steps = policy_result.get("next_steps") or []
+    refund_options = policy_result.get("refund_options") or []
+    pickup = policy_result.get("pickup")
+
+    if message and any([
+        eligibility is not None,
+        reason,
+        next_steps,
+        refund_options,
+        pickup,
+    ]):
+        lines = [message]
+        if eligibility is not None:
+            lines.append(f"Eligibility: {'Eligible' if eligibility else 'Not eligible'}")
+        if reason:
+            lines.append(f"Reason: {reason}")
+        if refund_options:
+            lines.append(f"Refund options: {', '.join(refund_options)}")
+        if pickup:
+            lines.append(
+                f"Pickup: {pickup.get('status', 'scheduled')} (attempts: {pickup.get('attempts', 0)})"
+            )
+        if next_steps:
+            lines.append("Next steps:")
+            for idx, step in enumerate(next_steps, 1):
+                lines.append(f"{idx}. {step}")
+        return "\n\n".join(lines)
+
     # If the policy engine already generated a detailed message, use it
     if message:
         return message

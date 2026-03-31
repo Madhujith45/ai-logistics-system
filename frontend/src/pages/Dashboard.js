@@ -6,9 +6,8 @@ import {
   AlertCircle, Sun, Moon
 } from "lucide-react";
 import ChatWidget from "../components/ChatWidget";
+import { BASE_URL } from "../apiBase";
 import "./Dashboard.css";
-
-const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
 
 function Dashboard({ setToken }) {
   const navigate = useNavigate();

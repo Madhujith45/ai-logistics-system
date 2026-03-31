@@ -1,33 +1,16 @@
 # app/seed_data.py
 
-"""
-Demo data seeder for LogiAI.
+"""MongoDB demo seeder for LogiAI."""
 
-Populates the database with:
-    - 1 admin user
-    - 3 customer users with unique order histories
-    - 15 realistic orders across all statuses
-    - Idempotent — safe to call on every startup.
-
-Credentials:
-    Admin  : admin / admin123
-    User 1 : rahul@logiai.com / rahul123
-    User 2 : priya@logiai.com / priya123
-    User 3 : amit@logiai.com  / amit123
-"""
+from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta
 
-from app.database import SessionLocal
 from app.auth import get_password_hash
+from app.database import create_ticket, create_user, get_collection, get_user_by_email
 
 logger = logging.getLogger(__name__)
-
-
-# ──────────────────────────────────────────────
-# Users
-# ──────────────────────────────────────────────
 
 USERS = [
     {
@@ -60,407 +43,354 @@ USERS = [
     },
 ]
 
-# ──────────────────────────────────────────────
-# Orders  (owner_email links to the user above)
-# ──────────────────────────────────────────────
-
 SAMPLE_ORDERS = [
-    # ── Rahul Sharma's orders ──
     {
         "order_id": "ORD-1001",
         "owner_email": "rahul@logiai.com",
         "customer_name": "Rahul Sharma",
         "product_name": "iPhone 15 Pro Max",
+        "product": "iPhone 15 Pro Max",
+        "category": "electronics",
         "price": 159900,
-        "payment_mode": "UPI",
-        "status": "Processing",
+        "payment_mode": "prepaid",
+        "status": "processing",
         "origin": "Mumbai Warehouse",
         "destination": "Delhi, India",
+        "order_date": "2026-02-28",
         "expected_delivery": "2026-03-08",
         "delivery_date": None,
-    },
-    {
-        "order_id": "ORD-1002",
-        "owner_email": "rahul@logiai.com",
-        "customer_name": "Rahul Sharma",
-        "product_name": "Sony WH-1000XM5 Headphones",
-        "price": 29990,
-        "payment_mode": "CARD",
-        "status": "Shipped",
-        "origin": "Chennai Hub",
-        "destination": "Bangalore, India",
-        "expected_delivery": "2026-03-04",
-        "delivery_date": None,
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-1003",
         "owner_email": "rahul@logiai.com",
         "customer_name": "Rahul Sharma",
         "product_name": "Samsung Galaxy S24 Ultra",
+        "product": "Samsung Galaxy S24 Ultra",
+        "category": "electronics",
         "price": 129999,
-        "payment_mode": "NET_BANKING",
-        "status": "Delivered",
+        "payment_mode": "prepaid",
+        "status": "delivered",
         "origin": "Hyderabad Warehouse",
         "destination": "Pune, India",
+        "order_date": "2026-02-16",
         "expected_delivery": "2026-02-20",
         "delivery_date": "2026-02-20",
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-1004",
         "owner_email": "rahul@logiai.com",
         "customer_name": "Rahul Sharma",
-        "product_name": "Nike Air Max 270",
-        "price": 12995,
-        "payment_mode": "COD",
-        "status": "Placed",
-        "origin": "Kolkata Hub",
-        "destination": "Lucknow, India",
-        "expected_delivery": "2026-03-12",
-        "delivery_date": None,
+        "product_name": "Nike Air Zoom Pegasus 41",
+        "product": "Nike Air Zoom Pegasus 41",
+        "category": "fashion",
+        "price": 7499,
+        "payment_mode": "cod",
+        "status": "delivered",
+        "origin": "Chennai Hub",
+        "destination": "Delhi, India",
+        "order_date": "2026-03-12",
+        "expected_delivery": "2026-03-16",
+        "delivery_date": "2026-03-16",
+        "return_window_days": 10,
     },
     {
         "order_id": "ORD-1005",
         "owner_email": "rahul@logiai.com",
         "customer_name": "Rahul Sharma",
-        "product_name": "MacBook Air M3",
-        "price": 114990,
-        "payment_mode": "CARD",
-        "status": "Delivered",
-        "origin": "Delhi Warehouse",
-        "destination": "Jaipur, India",
-        "expected_delivery": "2026-01-12",
-        "delivery_date": "2026-01-10",
-    },
-
-    # ── Priya Patel's orders ──
-    {
-        "order_id": "ORD-2001",
-        "owner_email": "priya@logiai.com",
-        "customer_name": "Priya Patel",
-        "product_name": "iPad Air (M2)",
-        "price": 69900,
-        "payment_mode": "UPI",
-        "status": "Out for Delivery",
-        "origin": "Ahmedabad Warehouse",
-        "destination": "Surat, India",
-        "expected_delivery": "2026-02-28",
+        "product_name": "Apple Watch Series 10",
+        "product": "Apple Watch Series 10",
+        "category": "electronics",
+        "price": 45999,
+        "payment_mode": "prepaid",
+        "status": "processing",
+        "origin": "Mumbai Warehouse",
+        "destination": "Delhi, India",
+        "order_date": "2026-03-17",
+        "expected_delivery": "2026-03-21",
         "delivery_date": None,
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-2002",
         "owner_email": "priya@logiai.com",
         "customer_name": "Priya Patel",
         "product_name": "Dyson V15 Vacuum Cleaner",
+        "product": "Dyson V15 Vacuum Cleaner",
+        "category": "electronics",
         "price": 62900,
-        "payment_mode": "CARD",
-        "status": "Delivered",
+        "payment_mode": "prepaid",
+        "status": "delivered",
         "origin": "Mumbai Warehouse",
         "destination": "Nashik, India",
+        "order_date": "2026-02-10",
         "expected_delivery": "2026-02-15",
         "delivery_date": "2026-02-14",
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-2003",
         "owner_email": "priya@logiai.com",
         "customer_name": "Priya Patel",
-        "product_name": "Kindle Paperwhite (2025)",
-        "price": 15999,
-        "payment_mode": "WALLET",
-        "status": "Processing",
-        "origin": "Chennai Hub",
-        "destination": "Coimbatore, India",
-        "expected_delivery": "2026-03-06",
-        "delivery_date": None,
+        "product_name": "Amazon Bazaar Wooden Shelf",
+        "product": "Amazon Bazaar Wooden Shelf",
+        "category": "amazon_bazaar",
+        "price": 3899,
+        "payment_mode": "prepaid",
+        "status": "delivered",
+        "origin": "Ahmedabad Warehouse",
+        "destination": "Surat, India",
+        "order_date": "2026-03-05",
+        "expected_delivery": "2026-03-10",
+        "delivery_date": "2026-03-10",
+        "return_window_days": 5,
     },
     {
         "order_id": "ORD-2004",
         "owner_email": "priya@logiai.com",
         "customer_name": "Priya Patel",
-        "product_name": "Levi's 501 Original Jeans",
-        "price": 4999,
-        "payment_mode": "COD",
-        "status": "Shipped",
-        "origin": "Bangalore Hub",
-        "destination": "Mysore, India",
-        "expected_delivery": "2026-03-03",
-        "delivery_date": None,
+        "product_name": "E-Book Subscription (Digital)",
+        "product": "E-Book Subscription (Digital)",
+        "category": "digital_products",
+        "price": 899,
+        "payment_mode": "prepaid",
+        "status": "delivered",
+        "origin": "Digital Fulfillment",
+        "destination": "Surat, India",
+        "order_date": "2026-03-17",
+        "expected_delivery": "2026-03-17",
+        "delivery_date": "2026-03-17",
+        "return_window_days": 3,
     },
     {
         "order_id": "ORD-2005",
         "owner_email": "priya@logiai.com",
         "customer_name": "Priya Patel",
-        "product_name": "Boat Airdopes 141",
-        "price": 1299,
-        "payment_mode": "UPI",
-        "status": "Delivered",
-        "origin": "Delhi Warehouse",
-        "destination": "Chandigarh, India",
-        "expected_delivery": "2026-01-25",
-        "delivery_date": "2026-01-24",
-    },
-
-    # ── Amit Verma's orders ──
-    {
-        "order_id": "ORD-3001",
-        "owner_email": "amit@logiai.com",
-        "customer_name": "Amit Verma",
-        "product_name": "Dell XPS 15 Laptop",
-        "price": 164990,
-        "payment_mode": "NET_BANKING",
-        "status": "Delivered",
-        "origin": "Hyderabad Warehouse",
-        "destination": "Vizag, India",
-        "expected_delivery": "2026-02-18",
-        "delivery_date": "2026-02-17",
-    },
-    {
-        "order_id": "ORD-3002",
-        "owner_email": "amit@logiai.com",
-        "customer_name": "Amit Verma",
-        "product_name": "PlayStation 5 Slim",
-        "price": 49990,
-        "payment_mode": "CARD",
-        "status": "Shipped",
-        "origin": "Mumbai Warehouse",
-        "destination": "Indore, India",
-        "expected_delivery": "2026-03-05",
+        "product_name": "Kindle Paperwhite 2025",
+        "product": "Kindle Paperwhite 2025",
+        "category": "electronics",
+        "price": 15999,
+        "payment_mode": "prepaid",
+        "status": "shipped",
+        "origin": "Chennai Hub",
+        "destination": "Surat, India",
+        "order_date": "2026-03-16",
+        "expected_delivery": "2026-03-20",
         "delivery_date": None,
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-3003",
         "owner_email": "amit@logiai.com",
         "customer_name": "Amit Verma",
-        "product_name": "Samsung 55\" OLED TV",
+        "product_name": "Samsung 55 OLED TV",
+        "product": "Samsung 55 OLED TV",
+        "category": "electronics",
         "price": 134990,
-        "payment_mode": "NET_BANKING",
-        "status": "Placed",
+        "payment_mode": "prepaid",
+        "status": "ordered",
         "origin": "Delhi Warehouse",
         "destination": "Bhopal, India",
+        "order_date": "2026-03-10",
         "expected_delivery": "2026-03-14",
         "delivery_date": None,
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-3004",
         "owner_email": "amit@logiai.com",
         "customer_name": "Amit Verma",
-        "product_name": "JBL Flip 6 Speaker",
-        "price": 11999,
-        "payment_mode": "UPI",
-        "status": "Delivered",
-        "origin": "Kolkata Hub",
-        "destination": "Patna, India",
-        "expected_delivery": "2026-02-05",
-        "delivery_date": "2026-02-04",
+        "product_name": "Sony WH-1000XM5 Headphones",
+        "product": "Sony WH-1000XM5 Headphones",
+        "category": "electronics",
+        "price": 29990,
+        "payment_mode": "prepaid",
+        "status": "delivered",
+        "origin": "Hyderabad Warehouse",
+        "destination": "Bhopal, India",
+        "order_date": "2026-03-10",
+        "expected_delivery": "2026-03-14",
+        "delivery_date": "2026-03-14",
+        "return_window_days": 7,
     },
     {
         "order_id": "ORD-3005",
         "owner_email": "amit@logiai.com",
         "customer_name": "Amit Verma",
-        "product_name": "Adidas Ultraboost 23",
-        "price": 16999,
-        "payment_mode": "WALLET",
-        "status": "Out for Delivery",
-        "origin": "Bangalore Hub",
-        "destination": "Kochi, India",
-        "expected_delivery": "2026-02-28",
+        "product_name": "Gaming Chair Pro X",
+        "product": "Gaming Chair Pro X",
+        "category": "non_returnable",
+        "price": 14999,
+        "payment_mode": "prepaid",
+        "status": "delivered",
+        "origin": "Delhi Warehouse",
+        "destination": "Bhopal, India",
+        "order_date": "2026-03-08",
+        "expected_delivery": "2026-03-12",
+        "delivery_date": "2026-03-12",
+        "return_window_days": 0,
+    },
+    {
+        "order_id": "ORD-3006",
+        "owner_email": "amit@logiai.com",
+        "customer_name": "Amit Verma",
+        "product_name": "LogiAI Smart Speaker",
+        "product": "LogiAI Smart Speaker",
+        "category": "electronics",
+        "price": 9999,
+        "payment_mode": "prepaid",
+        "status": "out for delivery",
+        "origin": "Delhi Warehouse",
+        "destination": "Bhopal, India",
+        "order_date": "2026-03-17",
+        "expected_delivery": "2026-03-18",
         "delivery_date": None,
+        "return_window_days": 7,
     },
 ]
 
-# ──────────────────────────────────────────────
-# Demo Tickets (pre-populated for admin dashboard)
-# ──────────────────────────────────────────────
 
-SAMPLE_TICKETS = [
+DEMO_TICKETS = [
     {
-        "user_query": "Where is my order ORD-1001?",
+        "text": "Where is my order ORD-1001?",
         "order_id": "ORD-1001",
-        "intent_detected": "TRACK_ORDER",
+        "intent": "TRACK_ORDER",
         "confidence": 0.96,
         "status": "AUTO_RESOLVED",
-        "ai_response": "📦 Your order ORD-1001 (iPhone 15 Pro Max) is currently being **Processing** 🛠️.\n\n📍 Route: Mumbai Warehouse → Delhi, India\n📅 Expected Delivery: 2026-03-08",
-        "owner_email": "rahul@logiai.com",
-        "minutes_ago": 5,
+        "message": "Your order ORD-1001 is currently processing.",
+        "user_email": "rahul@logiai.com",
     },
     {
-        "user_query": "I want to cancel order ORD-1002",
-        "order_id": "ORD-1002",
-        "intent_detected": "CANCEL_ORDER",
-        "confidence": 0.94,
-        "status": "AUTO_RESOLVED",
-        "ai_response": "✅ Your order **ORD-1002** (Samsung Galaxy S24 Ultra) has been **cancelled** successfully.\n\n💰 Refund of ₹134999 will be credited to your Credit Card within 5-7 business days.",
-        "owner_email": "rahul@logiai.com",
-        "minutes_ago": 12,
-    },
-    {
-        "user_query": "Track my order ORD-2001",
-        "order_id": "ORD-2001",
-        "intent_detected": "TRACK_ORDER",
-        "confidence": 0.98,
-        "status": "AUTO_RESOLVED",
-        "ai_response": "📦 Your order ORD-2001 (MacBook Air M3) is currently **Shipped** 🚛.\n\n📍 Route: Delhi Warehouse → Jaipur, India\n📅 Expected Delivery: 2026-03-05",
-        "owner_email": "priya@logiai.com",
-        "minutes_ago": 25,
-    },
-    {
-        "user_query": "I received a damaged product for ORD-2004",
-        "order_id": "ORD-2004",
-        "intent_detected": "DAMAGED_PRODUCT",
-        "confidence": 0.91,
-        "status": "PENDING_ADMIN",
-        "ai_response": "I'm sorry to hear about the damaged product. Your case has been escalated to our support team for immediate review.",
-        "escalation_reason": "Damaged product reported — requires admin verification",
-        "owner_email": "priya@logiai.com",
-        "minutes_ago": 40,
-    },
-    {
-        "user_query": "Where is ORD-3001?",
-        "order_id": "ORD-3001",
-        "intent_detected": "TRACK_ORDER",
-        "confidence": 0.95,
-        "status": "AUTO_RESOLVED",
-        "ai_response": "📦 Your order ORD-3001 (Sony WH-1000XM5) is **Out for Delivery** 🚚.\n\n📍 Route: Chennai Hub → Hyderabad, India\n📅 Expected Delivery: 2026-02-28",
-        "owner_email": "amit@logiai.com",
-        "minutes_ago": 55,
-    },
-    {
-        "user_query": "I want a refund for ORD-3004",
-        "order_id": "ORD-3004",
-        "intent_detected": "REFUND_REQUEST",
-        "confidence": 0.92,
-        "status": "AUTO_RESOLVED",
-        "ai_response": "✅ Your refund request for **ORD-3004** (JBL Flip 6 Speaker) has been approved.\n\n💰 Refund of ₹11999 will be credited to your UPI account within 3-5 business days.",
-        "owner_email": "amit@logiai.com",
-        "minutes_ago": 70,
-    },
-    {
-        "user_query": "Cancel ORD-2003 please",
-        "order_id": "ORD-2003",
-        "intent_detected": "CANCEL_ORDER",
+        "text": "I want a refund for ORD-2002",
+        "order_id": "ORD-2002",
+        "intent": "REFUND_REQUEST",
         "confidence": 0.93,
         "status": "PENDING_ADMIN",
-        "ai_response": "❌ Sorry, your order **ORD-2003** (Dyson V15 Detect) is already **Out for Delivery** and cannot be cancelled at this stage.",
-        "escalation_reason": "Cancellation denied — order already out for delivery",
-        "owner_email": "priya@logiai.com",
-        "minutes_ago": 90,
+        "message": "Refund request captured and pending policy check.",
+        "user_email": "priya@logiai.com",
     },
     {
-        "user_query": "I got the wrong item in ORD-1004",
-        "order_id": "ORD-1004",
-        "intent_detected": "MISMATCH_PRODUCT",
-        "confidence": 0.89,
+        "text": "Cancel my order ORD-1005",
+        "order_id": "ORD-1005",
+        "intent": "CANCEL_ORDER",
+        "confidence": 0.95,
+        "status": "AUTO_RESOLVED",
+        "message": "Cancellation request captured and processed.",
+        "user_email": "rahul@logiai.com",
+    },
+    {
+        "text": "My order ORD-3006 is still not right, please cancel",
+        "order_id": "ORD-3006",
+        "intent": "CANCEL_ORDER",
+        "confidence": 0.88,
         "status": "PENDING_ADMIN",
-        "ai_response": "I'm sorry about the wrong item. Your complaint has been escalated to our team for investigation and resolution.",
-        "escalation_reason": "Product mismatch reported — requires admin review",
-        "owner_email": "rahul@logiai.com",
-        "minutes_ago": 120,
+        "message": "Order is already out for delivery. Cancellation needs review.",
+        "user_email": "amit@logiai.com",
     },
     {
-        "user_query": "What is the status of ORD-3005?",
+        "text": "I received a damaged product for ORD-3004",
+        "order_id": "ORD-3004",
+        "intent": "DAMAGED_PRODUCT",
+        "confidence": 0.92,
+        "status": "PENDING_ADMIN",
+        "message": "Damage report received. Please upload proof for verification.",
+        "user_email": "amit@logiai.com",
+    },
+    {
+        "text": "Wrong item received for ORD-2003",
+        "order_id": "ORD-2003",
+        "intent": "MISMATCH_PRODUCT",
+        "confidence": 0.9,
+        "status": "PENDING_ADMIN",
+        "message": "Mismatch report received. Upload proof for verification.",
+        "user_email": "priya@logiai.com",
+    },
+    {
+        "text": "Refund for ORD-2003",
+        "order_id": "ORD-2003",
+        "intent": "REFUND_REQUEST",
+        "confidence": 0.9,
+        "status": "PENDING_ADMIN",
+        "message": "Refund request captured. Return window may be expired.",
+        "user_email": "priya@logiai.com",
+    },
+    {
+        "text": "Return request for ORD-3005",
         "order_id": "ORD-3005",
-        "intent_detected": "TRACK_ORDER",
-        "confidence": 0.97,
-        "status": "AUTO_RESOLVED",
-        "ai_response": "📦 Your order ORD-3005 (Adidas Ultraboost 23) is **Out for Delivery** 🚚.\n\n📍 Route: Bangalore Hub → Kochi, India\n📅 Expected Delivery: 2026-02-28",
-        "owner_email": "amit@logiai.com",
-        "minutes_ago": 150,
-    },
-    {
-        "user_query": "Track ORD-1003",
-        "order_id": "ORD-1003",
-        "intent_detected": "TRACK_ORDER",
-        "confidence": 0.96,
-        "status": "AUTO_RESOLVED",
-        "ai_response": "📦 Your order ORD-1003 (Sony PlayStation 5) has been **Delivered** 📦✅.\n\n📍 Delivered to: Chennai, India\n📅 Delivered on: 2026-02-15",
-        "owner_email": "rahul@logiai.com",
-        "minutes_ago": 180,
+        "intent": "REFUND_REQUEST",
+        "confidence": 0.87,
+        "status": "PENDING_ADMIN",
+        "message": "Non-returnable category requires damage proof or exception review.",
+        "user_email": "amit@logiai.com",
     },
 ]
 
 
-# ──────────────────────────────────────────────
-# Seed function
-# ──────────────────────────────────────────────
-
-def seed_all():
-    """Insert seed data if the tables are empty. Idempotent."""
-    from app.models import User, Order, Ticket
-
-    db = SessionLocal()
+def seed_all() -> None:
     try:
-        # ── Seed all users ────────────────────
+        users_col = get_collection("users")
+        orders_col = get_collection("orders")
+
         email_to_user_id: dict[str, int] = {}
 
-        for udata in USERS:
-            user = db.query(User).filter(User.username == udata["username"]).first()
-            if not user:
-                user = User(
-                    username=udata["username"],
-                    name=udata["name"],
-                    email=udata["email"],
-                    hashed_password=get_password_hash(udata["password"]),
-                    role=udata["role"],
-                )
-                db.add(user)
-                db.commit()
-                db.refresh(user)
-                logger.info(f"Seeded user: {udata['username']}")
-            email_to_user_id[udata["email"]] = user.id
+        for u in USERS:
+            existing = get_user_by_email(u["email"])
+            if existing:
+                email_to_user_id[u["email"]] = existing["id"]
+                continue
 
-        # ── Seed orders ──────────────────────
-        for odata in SAMPLE_ORDERS:
-            exists = db.query(Order).filter(Order.order_id == odata["order_id"]).first()
+            created = create_user(
+                name=u["name"],
+                email=u["email"],
+                password_hash=get_password_hash(u["password"]),
+                role=u["role"],
+            )
+
+            # Keep admin login backward-compatible with username="admin"
+            if u["username"] == "admin":
+                users_col.update_one(
+                    {"id": created["id"]},
+                    {"$set": {"username": "admin"}},
+                )
+
+            email_to_user_id[u["email"]] = created["id"]
+            logger.info("Seeded user: %s", u["email"])
+
+        for order in SAMPLE_ORDERS:
+            exists = orders_col.find_one({"order_id": order["order_id"]})
             if exists:
                 continue
 
-            owner_id = email_to_user_id.get(odata["owner_email"])
+            payload = {
+                **order,
+                "user_id": email_to_user_id.get(order["owner_email"]),
+                "created_at": datetime.utcnow(),
+            }
+            orders_col.insert_one(payload)
 
-            order = Order(
-                order_id=odata["order_id"],
-                customer_name=odata["customer_name"],
-                product_name=odata["product_name"],
-                price=odata["price"],
-                payment_mode=odata["payment_mode"],
-                status=odata["status"],
-                origin=odata["origin"],
-                destination=odata["destination"],
-                expected_delivery=odata["expected_delivery"],
-                delivery_date=odata["delivery_date"],
-                return_window_days=7,
-                user_id=owner_id,
-            )
-            db.add(order)
-
-        db.commit()
-
-        # ── Seed demo tickets ────────────────
-        existing_tickets = db.query(Ticket).count()
-        if existing_tickets == 0:
-            now = datetime.utcnow()
-            for tdata in SAMPLE_TICKETS:
-                owner_id = email_to_user_id.get(tdata["owner_email"])
-                ticket = Ticket(
-                    ticket_id=f"DEMO-{SAMPLE_TICKETS.index(tdata)+1:03d}",
-                    user_query=tdata["user_query"],
-                    order_id=tdata["order_id"],
-                    intent_detected=tdata["intent_detected"],
-                    confidence=tdata["confidence"],
-                    status=tdata["status"],
-                    ai_response=tdata["ai_response"],
-                    user_id=owner_id,
-                    escalation_reason=tdata.get("escalation_reason"),
-                    admin_decision=None,
-                    created_at=now - timedelta(minutes=tdata["minutes_ago"]),
+        ticket_count = get_collection("tickets").count_documents({})
+        if ticket_count == 0:
+            tickets_col = get_collection("tickets")
+            for idx, t in enumerate(DEMO_TICKETS):
+                user_id = email_to_user_id.get(t["user_email"])
+                created_at = datetime.utcnow() - timedelta(minutes=(idx + 1) * 10)
+                tickets_col.insert_one(
+                    {
+                        "ticket_id": f"DEMO-{idx + 1:03d}",
+                        "user_query": t["text"],
+                        "order_id": t["order_id"],
+                        "intent_detected": t["intent"],
+                        "confidence": t["confidence"],
+                        "status": t["status"],
+                        "ai_response": t["message"],
+                        "user_id": user_id,
+                        "escalation_reason": t.get("escalation_reason"),
+                        "admin_decision": None,
+                        "created_at": created_at,
+                    }
                 )
-                db.add(ticket)
-            db.commit()
-            logger.info(f"Seeded {len(SAMPLE_TICKETS)} demo tickets.")
 
-        logger.info("Seed data verified / inserted. "
-                     f"{len(USERS)} users, {len(SAMPLE_ORDERS)} orders.")
-
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Seed error: {e}")
-    finally:
-        db.close()
+        logger.info("MongoDB seed verification complete.")
+    except Exception as exc:
+        logger.warning("Seed skipped: MongoDB not reachable or not configured yet (%s)", exc)

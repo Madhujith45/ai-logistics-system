@@ -13,8 +13,7 @@ import {
   MapPin
 } from "lucide-react";
 import "./App.css";
-
-const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
+import { BASE_URL } from "./apiBase";
 
 const weeklyData = [
   { name: "Mon", orders: 400, resolved: 240, escalated: 20 },
@@ -37,6 +36,14 @@ function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [orders, setOrders] = useState([]);
   const [orderSearch, setOrderSearch] = useState("");
+  const [orderUploads, setOrderUploads] = useState([]);
+  const [uploadsLoading, setUploadsLoading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadPreviewUrl, setUploadPreviewUrl] = useState("");
+  const [selectedUploadName, setSelectedUploadName] = useState("");
+  const [selectedUploadType, setSelectedUploadType] = useState("");
+  const [uploadOrderSearch, setUploadOrderSearch] = useState("");
+  const [uploadOrderSelected, setUploadOrderSelected] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -151,6 +158,100 @@ function Admin() {
     setDetailLoading(false);
   };
 
+  const fetchOrderUploads = useCallback(async (orderId) => {
+    if (!orderId) {
+      setOrderUploads([]);
+      return;
+    }
+
+    setUploadsLoading(true);
+    setUploadError("");
+    setUploadPreviewUrl("");
+    setSelectedUploadName("");
+    setSelectedUploadType("");
+
+    try {
+      const res = await fetch(`${BASE_URL}/admin/uploads/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        logout();
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to load uploads");
+      }
+
+      const data = await res.json();
+      setOrderUploads(data.uploads || []);
+    } catch (err) {
+      console.error(err);
+      setOrderUploads([]);
+      setUploadError("Could not load uploaded proof files for this order.");
+    } finally {
+      setUploadsLoading(false);
+    }
+  }, [token, logout]);
+
+  const previewUpload = async (uploadId, filename) => {
+    try {
+      setUploadError("");
+      const res = await fetch(`${BASE_URL}/admin/uploads/${uploadId}/file`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        logout();
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch upload preview");
+      }
+
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const typeFromBlob = (blob.type || "").toLowerCase();
+      const fileLower = (filename || "").toLowerCase();
+      const extIsImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(fileLower);
+      const extIsVideo = /\.(mp4|webm|ogg|mov|mkv|avi|m4v)$/i.test(fileLower);
+
+      if (uploadPreviewUrl) {
+        URL.revokeObjectURL(uploadPreviewUrl);
+      }
+
+      setUploadPreviewUrl(objectUrl);
+      setSelectedUploadName(filename || "Uploaded proof");
+      if (typeFromBlob.startsWith("image/") || extIsImage) {
+        setSelectedUploadType("image");
+      } else if (typeFromBlob.startsWith("video/") || extIsVideo) {
+        setSelectedUploadType("video");
+      } else {
+        setSelectedUploadType("file");
+      }
+    } catch (err) {
+      console.error(err);
+      setUploadError("Could not open this uploaded file.");
+    }
+  };
+
+  const handleUploadOrderSearch = () => {
+    const orderId = uploadOrderSearch.trim();
+    if (!orderId) {
+      setUploadError("Enter an order ID to load uploaded proofs.");
+      return;
+    }
+    setUploadOrderSelected(orderId);
+    fetchOrderUploads(orderId);
+  };
+
   const getPolicyVerdict = (detail) => {
     if (!detail || !detail.order_details) return null;
     const order = detail.order_details;
@@ -191,7 +292,7 @@ function Admin() {
         label: "Order Value",
         pass: price <= 50000,
         detail: price > 50000
-          ? `High-value order (₹${price.toLocaleString()}) — requires senior approval`
+          ? `High-value order (₹${price.toLocaleString()}) — requires senior approval (manual review for refunds over ₹50,000)`
           : `₹${price.toLocaleString()} — within auto-approval limit`,
       });
     } else if (intent === "CANCEL_ORDER") {
@@ -229,6 +330,23 @@ function Admin() {
     fetchMetrics();
     fetchOrders();
   }, [token, logout, fetchTickets, fetchMetrics, fetchOrders]);
+
+  useEffect(() => {
+    const orderId = ticketDetail?.order_details?.order_id;
+    if (!ticketDetail || !orderId) {
+      setOrderUploads([]);
+      return;
+    }
+    fetchOrderUploads(orderId);
+  }, [ticketDetail, fetchOrderUploads]);
+
+  useEffect(() => {
+    return () => {
+      if (uploadPreviewUrl) {
+        URL.revokeObjectURL(uploadPreviewUrl);
+      }
+    };
+  }, [uploadPreviewUrl]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -303,6 +421,9 @@ function Admin() {
           </button>
           <button className={`sidebar-link ${activeTab === "analytics" ? "active" : ""}`} onClick={() => setActiveTab("analytics")}>
             <BarChart3 size={18} /> Analytics
+          </button>
+          <button className={`sidebar-link ${activeTab === "uploads" ? "active" : ""}`} onClick={() => setActiveTab("uploads")}>
+            <FileText size={18} /> Uploads
           </button>
         </nav>
 
@@ -674,6 +795,77 @@ function Admin() {
           </>
         )}
 
+        {/* ─── Uploads Tab ─── */}
+        {activeTab === "uploads" && (
+          <>
+            <div className="admin-page-header">
+              <h2>Uploaded Proofs</h2>
+            </div>
+
+            <div className="order-search-bar">
+              <Search size={18} className="order-search-icon" />
+              <input
+                type="text"
+                placeholder="Enter Order ID (e.g. ORD-1003)"
+                value={uploadOrderSearch}
+                onChange={(e) => setUploadOrderSearch(e.target.value)}
+                className="order-search-input"
+              />
+              <button onClick={handleUploadOrderSearch}>Load Uploads</button>
+            </div>
+
+            <div className="table-card">
+              {!uploadOrderSelected ? (
+                <div className="empty-state">
+                  <FileText size={48} />
+                  <p>Search by order ID to view uploaded videos/images.</p>
+                </div>
+              ) : uploadsLoading ? (
+                <p className="detail-no-data">Loading uploaded files for {uploadOrderSelected}...</p>
+              ) : orderUploads.length === 0 ? (
+                <p className="detail-no-data">No proof files uploaded for {uploadOrderSelected} yet.</p>
+              ) : (
+                <div className="policy-checks">
+                  {orderUploads.map((upload) => (
+                    <div key={upload.upload_id} className="policy-check-row" style={{ justifyContent: "space-between" }}>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{upload.filename || "proof file"}</div>
+                        <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                          {upload.size_bytes || 0} bytes | status: {upload.verification_status || "pending"}
+                        </div>
+                      </div>
+                      <button onClick={() => previewUpload(upload.upload_id, upload.filename)}>Preview</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {uploadError && (
+                <div className="detail-escalation-reason" style={{ marginTop: 12 }}>
+                  <AlertCircle size={14} /> {uploadError}
+                </div>
+              )}
+
+              {uploadPreviewUrl && (
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontWeight: 600, marginBottom: 8 }}>{selectedUploadName}</div>
+                  {selectedUploadType === "image" ? (
+                    <img
+                      src={uploadPreviewUrl}
+                      alt={selectedUploadName}
+                      style={{ width: "100%", borderRadius: 8, maxHeight: 420, objectFit: "contain" }}
+                    />
+                  ) : selectedUploadType === "video" ? (
+                    <video controls style={{ width: "100%", borderRadius: 8 }} src={uploadPreviewUrl} />
+                  ) : (
+                    <a href={uploadPreviewUrl} target="_blank" rel="noreferrer">Open uploaded file</a>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
       </main>
 
       {/* Ticket Detail Modal */}
@@ -742,6 +934,54 @@ function Admin() {
                 <div className="detail-section">
                   <h4><Truck size={16} /> Order Details</h4>
                   <p className="detail-no-data">No order ID was provided with this query.</p>
+                </div>
+              )}
+
+              {ticketDetail.order_details && (
+                <div className="detail-section">
+                  <h4>Damage Proof Uploads</h4>
+                  {uploadsLoading ? (
+                    <p className="detail-no-data">Loading uploaded files...</p>
+                  ) : orderUploads.length === 0 ? (
+                    <p className="detail-no-data">No proof files uploaded for this order yet.</p>
+                  ) : (
+                    <div className="policy-checks">
+                      {orderUploads.map((upload) => (
+                        <div key={upload.upload_id} className="policy-check-row" style={{ justifyContent: "space-between" }}>
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{upload.filename || "proof file"}</div>
+                            <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                              {upload.size_bytes || 0} bytes | status: {upload.verification_status || "pending"}
+                            </div>
+                          </div>
+                          <button onClick={() => previewUpload(upload.upload_id, upload.filename)}>Preview</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {uploadError && (
+                    <div className="detail-escalation-reason" style={{ marginTop: 10 }}>
+                      <AlertCircle size={14} /> {uploadError}
+                    </div>
+                  )}
+
+                  {uploadPreviewUrl && (
+                    <div style={{ marginTop: 12 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>{selectedUploadName}</div>
+                      {selectedUploadType === "image" ? (
+                        <img
+                          src={uploadPreviewUrl}
+                          alt={selectedUploadName}
+                          style={{ width: "100%", borderRadius: 8, maxHeight: 420, objectFit: "contain" }}
+                        />
+                      ) : selectedUploadType === "video" ? (
+                        <video controls style={{ width: "100%", borderRadius: 8 }} src={uploadPreviewUrl} />
+                      ) : (
+                        <a href={uploadPreviewUrl} target="_blank" rel="noreferrer">Open uploaded file</a>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

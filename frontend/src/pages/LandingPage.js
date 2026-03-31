@@ -6,8 +6,7 @@ import {
   Clock, AlertCircle, ChevronRight, Box, Sun, Moon,
   ShieldCheck, User, BrainCircuit, Database, Zap
 } from "lucide-react";
-
-const BASE_URL = process.env.REACT_APP_API_URL || "https://ai-logistics-system.onrender.com";
+import { BASE_URL } from "../apiBase";
 
 function LandingPage() {
   const navigate = useNavigate();

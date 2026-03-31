@@ -5,7 +5,15 @@ import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")  # Set via environment variable in production
+
+def _required_env(name: str) -> str:
+    value = os.getenv(name, "").strip()
+    if not value:
+        raise ValueError(f"{name} is not set")
+    return value
+
+
+SECRET_KEY = _required_env("JWT_SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
