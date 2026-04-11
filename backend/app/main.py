@@ -1,6 +1,8 @@
 # app/main.py
 
+import importlib
 import logging
+import os
 import re
 import shutil
 import uuid
@@ -67,6 +69,7 @@ from app.schemas import (
     RefundOptionsRequest,
     ReturnRequest,
     ReturnReasonsResponse,
+    UserGoogleLoginRequest,
     UserLoginRequest,
     UserRegisterRequest,
 )
@@ -112,6 +115,7 @@ def on_startup():
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
 
 
 def is_greeting_message(text: str) -> bool:
@@ -157,9 +161,9 @@ def is_greeting_message(text: str) -> bool:
     return has_greeting and not has_service_intent
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
-    return {"status": "OK"}
+    return {"status": "ok"}
 
 
 @app.get("/health/db")
@@ -573,7 +577,8 @@ def admin_metrics(payload=Depends(require_admin)):
 
 @app.post("/user/register")
 def user_register(req: UserRegisterRequest):
-    existing = get_user_by_email(req.email)
+    normalized_email = req.email.strip().lower()
+    existing = get_user_by_email(normalized_email)
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -581,7 +586,13 @@ def user_register(req: UserRegisterRequest):
         )
 
     password_hash = get_password_hash(req.password)
-    user = create_user(name=req.name, email=req.email, password_hash=password_hash, role="USER")
+    user = create_user(
+        name=req.name.strip(),
+        email=normalized_email,
+        password_hash=password_hash,
+        role="USER",
+        auth_provider="local",
+    )
 
     assign_orders_to_user(user["id"])
 
@@ -610,7 +621,7 @@ def user_register(req: UserRegisterRequest):
 @app.post("/user/login")
 def user_login(req: UserLoginRequest):
     try:
-        user = authenticate_customer(req.email, req.password)
+        user = authenticate_customer(req.email.strip().lower(), req.password)
     except Exception as exc:
         logger.exception("user_login_failed email=%s error=%s", req.email, exc)
         raise HTTPException(
@@ -621,6 +632,74 @@ def user_login(req: UserLoginRequest):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
 
     token = create_user_token(user)
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "name": user["name"],
+        "user": {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"],
+            "role": user["role"],
+        },
+    }
+
+
+@app.post("/user/google-login")
+def user_google_login(req: UserGoogleLoginRequest):
+    try:
+        google_requests_mod = importlib.import_module("google.auth.transport.requests")
+        google_id_token_mod = importlib.import_module("google.oauth2.id_token")
+    except ModuleNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google login dependency is missing on server.",
+        )
+
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google login is not configured on server.",
+        )
+
+    try:
+        idinfo = google_id_token_mod.verify_oauth2_token(
+            req.credential,
+            google_requests_mod.Request(),
+            GOOGLE_CLIENT_ID,
+        )
+    except Exception as exc:
+        logger.exception("google_login_verify_failed error=%s", exc)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google credential.")
+
+    email = str(idinfo.get("email", "")).strip().lower()
+    if not email or not idinfo.get("email_verified", False):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google email is not verified.")
+
+    name = str(idinfo.get("name") or email.split("@")[0]).strip()
+    google_sub = str(idinfo.get("sub") or "").strip()
+
+    user = get_user_by_email(email)
+    if not user:
+        user = create_user(
+            name=name,
+            email=email,
+            password_hash=None,
+            role="user",
+            auth_provider="google",
+            google_sub=google_sub or None,
+        )
+        assign_orders_to_user(user["id"])
+
+    token = create_access_token(
+        data={
+            "sub": user["email"],
+            "user_id": user["id"],
+            "name": user["name"],
+            "role": user["role"],
+        }
+    )
+
     return {
         "access_token": token,
         "token_type": "bearer",

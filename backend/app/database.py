@@ -142,6 +142,7 @@ def init_db() -> None:
         )
         db.users.create_index([("username", ASCENDING)], unique=True)
         db.users.create_index([("email", ASCENDING)], unique=True, sparse=True)
+        db.users.create_index([("google_sub", ASCENDING)], unique=True, sparse=True)
         db.users.create_index([("flagged", ASCENDING)])
 
         # Orders
@@ -469,7 +470,14 @@ def get_tickets_by_user(user_id: int) -> list[dict[str, Any]]:
     return [_serialize_ticket(row) for row in rows]
 
 
-def create_user(name: str, email: str, password_hash: str, role: str = "user"):
+def create_user(
+    name: str,
+    email: str,
+    password_hash: str | None,
+    role: str = "user",
+    auth_provider: str = "local",
+    google_sub: str | None = None,
+):
     users = get_collection("users")
     now = datetime.utcnow()
 
@@ -485,6 +493,8 @@ def create_user(name: str, email: str, password_hash: str, role: str = "user"):
         "name": name,
         "email": email,
         "hashed_password": password_hash,
+        "auth_provider": auth_provider,
+        "google_sub": google_sub,
         "role": role.lower(),
         "return_count": 0,
         "flagged": False,
@@ -504,6 +514,7 @@ def get_user_by_email(email: str):
         "name": user.get("name") or user.get("username"),
         "email": user.get("email") or user.get("username"),
         "password_hash": user.get("hashed_password"),
+        "auth_provider": user.get("auth_provider", "local"),
         "role": user.get("role", "user"),
         "return_count": user.get("return_count", 0),
         "flagged": bool(user.get("flagged", False)),
@@ -521,6 +532,7 @@ def get_user_by_username(username: str):
         "username": user.get("username"),
         "email": user.get("email") or user.get("username"),
         "password_hash": user.get("hashed_password"),
+        "auth_provider": user.get("auth_provider", "local"),
         "role": user.get("role", "user"),
         "return_count": user.get("return_count", 0),
         "flagged": bool(user.get("flagged", False)),
