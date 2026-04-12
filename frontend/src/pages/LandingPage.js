@@ -130,12 +130,31 @@ function LandingPage() {
           <div className="hero-right">
             <div className="hero-image-card">
               <div className="hero-image-overlay-card">
-                <div className="hero-overlay-stat">
-                  <Truck size={20} />
-                  <div>
-                    <span className="overlay-stat-num">4.8</span>
-                    <span className="overlay-stat-label">Trusted by businesses for dependable global freight support</span>
+                <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-5 w-full max-w-[420px]">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="rounded-xl bg-white/70 p-3">
+                      <p className="text-xl font-semibold leading-tight">⭐ 4.8</p>
+                      <p className="text-xs sm:text-sm text-slate-700">Customer Rating</p>
+                    </div>
+                    <div className="rounded-xl bg-white/70 p-3">
+                      <p className="text-xl font-semibold leading-tight">🚚 10K+</p>
+                      <p className="text-xs sm:text-sm text-slate-700">Shipments Delivered</p>
+                    </div>
+                    <div className="rounded-xl bg-white/70 p-3">
+                      <p className="text-xl font-semibold leading-tight">🌍 25+</p>
+                      <p className="text-xs sm:text-sm text-slate-700">Countries Covered</p>
+                    </div>
+                    <div className="rounded-xl bg-white/70 p-3">
+                      <p className="text-xl font-semibold leading-tight">⏱ 99%</p>
+                      <p className="text-xs sm:text-sm text-slate-700">On-time Delivery</p>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    className="mt-4 w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  >
+                    Start Shipping
+                  </button>
                 </div>
               </div>
             </div>
