@@ -133,7 +133,7 @@ function LandingPage() {
                 <div className="hero-overlay-stat">
                   <Truck size={20} />
                   <div>
-                    <span className="overlay-stat-num">4.8</span>
+                    <span className="overlay-stat-num">⭐ 4.8</span>
                     <span className="overlay-stat-label">Trusted by 4.3 lakh+ users for dependable global freight support</span>
                   </div>
                 </div>
