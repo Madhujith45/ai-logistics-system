@@ -130,44 +130,12 @@ function LandingPage() {
           <div className="hero-right">
             <div className="hero-image-card">
               <div className="hero-image-overlay-card">
-                <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-5 w-full max-w-[420px]">
-                  <p className="mb-4 text-xs font-medium uppercase tracking-wide text-gray-600">Trusted by businesses worldwide</p>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/70 pb-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <span>⭐</span>
-                        <span className="text-sm">Customer Rating</span>
-                      </div>
-                      <span className="text-2xl font-bold text-gray-900">4.8</span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-white/70 pb-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <span>🚚</span>
-                        <span className="text-sm">Shipments Delivered</span>
-                      </div>
-                      <span className="text-2xl font-bold text-gray-900">10K+</span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-white/70 pb-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <span>🌍</span>
-                        <span className="text-sm">Countries Covered</span>
-                      </div>
-                      <span className="text-2xl font-bold text-gray-900">25+</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <span>⏱</span>
-                        <span className="text-sm">On-time Delivery</span>
-                      </div>
-                      <span className="text-2xl font-bold text-green-600">99%</span>
-                    </div>
+                <div className="hero-overlay-stat">
+                  <Truck size={20} />
+                  <div>
+                    <span className="overlay-stat-num">4.8</span>
+                    <span className="overlay-stat-label">Trusted by 4.3 lakh+ users for dependable global freight support</span>
                   </div>
-                  <button
-                    type="button"
-                    className="mt-5 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
-                  >
-                    Start Shipping
-                  </button>
                 </div>
               </div>
             </div>
