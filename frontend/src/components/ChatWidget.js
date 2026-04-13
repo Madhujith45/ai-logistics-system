@@ -15,8 +15,10 @@ const ts = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 /* ── Speech Recognition ── */
-const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+const getSpeechRecognition = () => {
+  if (typeof window === "undefined") return null;
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+};
 
 /* ================================================================
    ChatWidget — floating bubble + popup
@@ -136,34 +138,71 @@ function ChatWidget({ externalOpen, onClose }) {
 
   /* ── Voice input ── */
   const toggleVoice = useCallback(() => {
+    const SpeechRecognition = getSpeechRecognition();
+
     if (!SpeechRecognition) {
-      alert("Speech recognition is not supported in your browser.");
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "Voice input is not supported in this browser. Please use Chrome, Edge, or another browser with speech recognition support.",
+          time: ts(),
+        },
+      ]);
       return;
     }
+
     if (listening) {
       recognitionRef.current?.stop();
       setListening(false);
       return;
     }
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      setInput((prev) => (prev ? prev + " " + transcript : transcript));
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => setListening(true);
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        setInput((prev) => (prev ? prev + " " + transcript : transcript));
+      };
+      recognition.onerror = (event) => {
+        setListening(false);
+        const errorType = event?.error || "unknown";
+        const errorMessage =
+          errorType === "not-allowed" || errorType === "service-not-allowed"
+            ? "Microphone access was blocked. Please allow mic permission and try again."
+            : errorType === "no-speech"
+              ? "No speech was detected. Please try speaking again."
+              : errorType === "audio-capture"
+                ? "No microphone was found or it is unavailable."
+                : "Voice input failed. Please try again.";
+
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: errorMessage, time: ts() },
+        ]);
+      };
+      recognition.onend = () => {
+        setListening(false);
+        setTimeout(() => inputRef.current?.focus(), 0);
+      };
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (error) {
       setListening(false);
-      // Keep keyboard flow smooth after voice capture: Enter should send.
-      setTimeout(() => inputRef.current?.focus(), 0);
-    };
-    recognition.onerror = () => setListening(false);
-    recognition.onend = () => {
-      setListening(false);
-      setTimeout(() => inputRef.current?.focus(), 0);
-    };
-    recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "Unable to start voice input. Please refresh the page and check browser microphone permissions.",
+          time: ts(),
+        },
+      ]);
+    }
   }, [listening]);
 
   /* ── File Upload for Damage Proof ── */
